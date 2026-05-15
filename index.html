@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>Facção de Jeans • Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --pink: #e91e63;
+        --pink-dark: #c2185b;
+        --gold: #d4a017;
+        --gold-light: #f0c75e;
+        --black: #0a0a0a;
+        --black-soft: #1c1c1c;
+        --white: #f5f5f5;
+        --gray: #9e9e9e;
+        --error: #ff5252;
+        --success: #4caf50;
+      }
+
+      body {
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background-color: var(--black);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        background-image:
+          radial-gradient(
+            circle at 30% 20%,
+            rgba(233, 30, 99, 0.08) 0%,
+            transparent 35%
+          ),
+          radial-gradient(
+            circle at 70% 70%,
+            rgba(212, 160, 23, 0.06) 0%,
+            transparent 40%
+          );
+      }
+
+      .login-container {
+        background-color: var(--black-soft);
+        border-radius: 24px;
+        padding: 40px 32px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow:
+          0 25px 50px -12px rgba(0, 0, 0, 0.8),
+          0 0 0 1px rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 160, 23, 0.15);
+        position: relative;
+        backdrop-filter: blur(10px);
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 36px;
+      }
+
+      .logo-icon {
+        font-size: 48px;
+        margin-bottom: 8px;
+        filter: drop-shadow(0 0 10px rgba(212, 160, 23, 0.4));
+      }
+
+      h1 {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        background: linear-gradient(135deg, var(--gold-light), var(--pink));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 6px;
+      }
+
+      .subtitle {
+        color: var(--gray);
+        font-size: 14px;
+        font-weight: 400;
+      }
+
+      .form-group {
+        margin-bottom: 22px;
+      }
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--gold-light);
+        margin-bottom: 8px;
+      }
+
+      .input-field {
+        width: 100%;
+        padding: 14px 16px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 160, 23, 0.25);
+        border-radius: 12px;
+        color: var(--white);
+        font-size: 15px;
+        transition: all 0.3s ease;
+        outline: none;
+      }
+
+      .input-field:focus {
+        border-color: var(--pink);
+        background-color: rgba(233, 30, 99, 0.05);
+        box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.15);
+      }
+
+      .input-field::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 14px;
+      }
+
+      .login-button {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .login-button:hover {
+        background: linear-gradient(135deg, var(--pink-dark), #ad1457);
+        box-shadow: 0 10px 25px -8px rgba(233, 30, 99, 0.5);
+        transform: translateY(-1px);
+      }
+
+      .login-button:active {
+        transform: translateY(0);
+      }
+
+      .login-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .forgot-link {
+        display: block;
+        text-align: right;
+        margin-top: 10px;
+        color: var(--gray);
+        font-size: 13px;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .forgot-link:hover {
+        color: var(--gold-light);
+      }
+
+      .error-message {
+        background-color: rgba(255, 82, 82, 0.1);
+        border: 1px solid rgba(255, 82, 82, 0.3);
+        color: #ff8a80;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        margin-bottom: 20px;
+        display: none;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .error-message.visible {
+        display: flex;
+      }
+
+      .success-message {
+        background-color: rgba(76, 175, 80, 0.1);
+        border: 1px solid rgba(76, 175, 80, 0.3);
+        color: #a5d6a7;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        margin-bottom: 20px;
+        display: none;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .success-message.visible {
+        display: flex;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 28px 0 20px;
+        color: var(--gray);
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .footer-text {
+        text-align: center;
+        color: var(--gray);
+        font-size: 12px;
+        margin-top: 24px;
+        opacity: 0.8;
+      }
+
+      .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .login-container {
+          padding: 30px 20px;
+          border-radius: 20px;
+        }
+        h1 {
+          font-size: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-header">
+        <div class="logo-icon">🧵</div>
+        <h1>Facção Jeans</h1>
+        <p class="subtitle">Painel de Gestão de Costura</p>
+      </div>
+
+      <div id="errorMessage" class="error-message">
+        <span>⚠️</span> <span id="errorText"></span>
+      </div>
+
+      <div id="successMessage" class="success-message">
+        <span>✅</span> <span id="successText"></span>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            class="input-field"
+            placeholder="seu@email.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input
+            type="password"
+            id="password"
+            class="input-field"
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" id="loginButton" class="login-button">
+          <span id="buttonText">Entrar</span>
+          <span id="spinner" class="spinner" style="display: none"></span>
+        </button>
+
+        <a href="#" class="forgot-link" id="forgotPasswordLink"
+          >Esqueceu a senha?</a
+        >
+      </form>
+
+      <div class="divider">ou</div>
+
+      <p class="footer-text">
+        Ambiente seguro • Todas as informações são criptografadas<br />
+        <span style="color: var(--gold-light)">Facção de Costura</span>
+      </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      (function () {
+        // Só executa se o Supabase estiver disponível
+        if (typeof window.supabase === "undefined") {
+          alert(
+            "Erro: biblioteca Supabase não carregou. Verifique sua internet.",
+          );
+          return;
+        }
+
+        const SUPABASE_URL = "https://evlatdyxcgklunwvnhcv.supabase.co";
+        const SUPABASE_ANON_KEY =
+          "sb_publishable_tn2G-m8F7M3Ey8C0LDJLNg_9MzszdAS";
+        const supabase = window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_ANON_KEY,
+        );
+
+        const loginForm = document.getElementById("loginForm");
+        if (!loginForm) {
+          alert("Elemento do formulário não encontrado. Verifique o HTML.");
+          return;
+        }
+
+        // --- Funções auxiliares (mesmas de antes) ---
+        const errorMessage = document.getElementById("errorMessage");
+        const errorText = document.getElementById("errorText");
+        const successMessage = document.getElementById("successMessage");
+        const successText = document.getElementById("successText");
+        const loginButton = document.getElementById("loginButton");
+        const buttonText = document.getElementById("buttonText");
+        const spinner = document.getElementById("spinner");
+        const forgotPasswordLink =
+          document.getElementById("forgotPasswordLink");
+
+        function showError(msg) {
+          errorText.textContent = msg;
+          errorMessage.classList.add("visible");
+          successMessage.classList.remove("visible");
+        }
+        function showSuccess(msg) {
+          successText.textContent = msg;
+          successMessage.classList.add("visible");
+          errorMessage.classList.remove("visible");
+        }
+        function clearMessages() {
+          errorMessage.classList.remove("visible");
+          successMessage.classList.remove("visible");
+        }
+        function setLoading(loading) {
+          loginButton.disabled = loading;
+          buttonText.style.display = loading ? "none" : "inline";
+          spinner.style.display = loading ? "inline-block" : "none";
+        }
+
+        // --- Evento de login ---
+        loginForm.addEventListener("submit", async function (e) {
+          e.preventDefault(); // sempre impede o recarregamento
+          clearMessages();
+
+          const emailInput = document.getElementById("email");
+          const passwordInput = document.getElementById("password");
+          const email = emailInput.value.trim();
+          const password = passwordInput.value;
+
+          if (!email || !password) {
+            showError("Preencha todos os campos.");
+            return;
+          }
+
+          setLoading(true);
+          try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email,
+              password,
+            });
+
+            if (error) {
+              if (error.message.includes("Invalid login credentials")) {
+                showError("Email ou senha incorretos.");
+              } else if (error.message.includes("Email not confirmed")) {
+                showError(
+                  "Email não confirmado. Verifique sua caixa de entrada.",
+                );
+              } else {
+                showError(error.message);
+              }
+              console.error("Erro Supabase:", error);
+              return;
+            }
+
+            showSuccess("Login realizado! Redirecionando...");
+            setTimeout(() => {
+              window.location.href = "/sistema/sistema.html"; // ajuste o caminho
+            }, 800);
+          } catch (err) {
+            console.error("Erro inesperado:", err);
+            showError("Erro de conexão. Verifique sua internet.");
+          } finally {
+            setLoading(false);
+          }
+        });
+
+        // --- Esqueceu a senha ---
+        forgotPasswordLink.addEventListener("click", async function (e) {
+          e.preventDefault();
+          clearMessages();
+          const email = document.getElementById("email").value.trim();
+          if (!email) {
+            showError("Digite seu email no campo acima.");
+            return;
+          }
+          setLoading(true);
+          try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+              redirectTo:
+                window.location.origin + "/sistema/redefinir-senha.html",
+            });
+            if (error) {
+              showError(error.message);
+            } else {
+              showSuccess("Email de recuperação enviado!");
+            }
+          } catch (err) {
+            showError("Falha ao enviar email.");
+          } finally {
+            setLoading(false);
+          }
+        });
+
+        // --- Verificar sessão existente ---
+        (async function checkSession() {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (session) {
+            window.location.href = "/sistema/sistema.html";
+          }
+        })();
+      })();
+    </script>
+  </body>
+</html>
