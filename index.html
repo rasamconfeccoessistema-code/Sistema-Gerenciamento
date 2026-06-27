@@ -1,476 +1,2302 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=yes"
-    />
-    <title>Facção de Jeans • Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <title>Facção Jeans - App do Gestor</title>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      :root {
-        --pink: #e91e63;
-        --pink-dark: #c2185b;
-        --gold: #d4a017;
-        --gold-light: #f0c75e;
-        --black: #0a0a0a;
-        --black-soft: #1c1c1c;
-        --white: #f5f5f5;
-        --gray: #9e9e9e;
-        --error: #ff5252;
-        --success: #4caf50;
-      }
-
-      body {
-        font-family:
-          "Segoe UI",
-          system-ui,
-          -apple-system,
-          sans-serif;
-        background-color: var(--black);
-        color: var(--white);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px;
-        background-image:
-          radial-gradient(
-            circle at 30% 20%,
-            rgba(233, 30, 99, 0.08) 0%,
-            transparent 35%
-          ),
-          radial-gradient(
-            circle at 70% 70%,
-            rgba(212, 160, 23, 0.06) 0%,
-            transparent 40%
-          );
-      }
-
-      .login-container {
-        background-color: var(--black-soft);
-        border-radius: 24px;
-        padding: 40px 32px;
-        width: 100%;
-        max-width: 420px;
-        box-shadow:
-          0 25px 50px -12px rgba(0, 0, 0, 0.8),
-          0 0 0 1px rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(212, 160, 23, 0.15);
-        position: relative;
-        backdrop-filter: blur(10px);
-      }
-
-      .login-header {
-        text-align: center;
-        margin-bottom: 36px;
-      }
-
-      .logo-icon {
-        font-size: 48px;
-        margin-bottom: 8px;
-        filter: drop-shadow(0 0 10px rgba(212, 160, 23, 0.4));
-      }
-
-      h1 {
-        font-size: 26px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-        background: linear-gradient(135deg, var(--gold-light), var(--pink));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 6px;
-      }
-
-      .subtitle {
-        color: var(--gray);
-        font-size: 14px;
-        font-weight: 400;
-      }
-
-      .form-group {
-        margin-bottom: 22px;
-      }
-
-      label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        color: var(--gold-light);
-        margin-bottom: 8px;
-      }
-
-      .input-field {
-        width: 100%;
-        padding: 14px 16px;
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(212, 160, 23, 0.25);
-        border-radius: 12px;
-        color: var(--white);
-        font-size: 15px;
-        transition: all 0.3s ease;
-        outline: none;
-      }
-
-      .input-field:focus {
-        border-color: var(--pink);
-        background-color: rgba(233, 30, 99, 0.05);
-        box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.15);
-      }
-
-      .input-field::placeholder {
-        color: rgba(255, 255, 255, 0.3);
-        font-size: 14px;
-      }
-
-      .login-button {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, var(--pink), var(--pink-dark));
-        border: none;
-        border-radius: 12px;
-        color: white;
-        font-weight: 700;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        letter-spacing: 0.5px;
-        margin-top: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .login-button:hover {
-        background: linear-gradient(135deg, var(--pink-dark), #ad1457);
-        box-shadow: 0 10px 25px -8px rgba(233, 30, 99, 0.5);
-        transform: translateY(-1px);
-      }
-
-      .login-button:active {
-        transform: translateY(0);
-      }
-
-      .login-button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        box-shadow: none;
-        transform: none;
-      }
-
-      .forgot-link {
-        display: block;
-        text-align: right;
-        margin-top: 10px;
-        color: var(--gray);
-        font-size: 13px;
-        text-decoration: none;
-        transition: color 0.2s;
-      }
-
-      .forgot-link:hover {
-        color: var(--gold-light);
-      }
-
-      .error-message {
-        background-color: rgba(255, 82, 82, 0.1);
-        border: 1px solid rgba(255, 82, 82, 0.3);
-        color: #ff8a80;
-        padding: 12px;
-        border-radius: 10px;
-        font-size: 13px;
-        margin-bottom: 20px;
-        display: none;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .error-message.visible {
-        display: flex;
-      }
-
-      .success-message {
-        background-color: rgba(76, 175, 80, 0.1);
-        border: 1px solid rgba(76, 175, 80, 0.3);
-        color: #a5d6a7;
-        padding: 12px;
-        border-radius: 10px;
-        font-size: 13px;
-        margin-bottom: 20px;
-        display: none;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .success-message.visible {
-        display: flex;
-      }
-
-      .divider {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 28px 0 20px;
-        color: var(--gray);
-        font-size: 12px;
-        text-transform: uppercase;
-      }
-
-      .divider::before,
-      .divider::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      .footer-text {
-        text-align: center;
-        color: var(--gray);
-        font-size: 12px;
-        margin-top: 24px;
-        opacity: 0.8;
-      }
-
-      .spinner {
-        width: 18px;
-        height: 18px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
+        /* ============================================================
+           APP MOBILE PROFISSIONAL - FACÇÃO JEANS
+           ============================================================ */
+        
+        :root {
+            --pink: #e91e63;
+            --pink-dark: #c2185b;
+            --gold: #d4a017;
+            --gold-light: #f0c75e;
+            --black: #0a0a0a;
+            --black-soft: #141414;
+            --black-medium: #1e1e1e;
+            --white: #f5f5f5;
+            --gray: #9e9e9e;
+            --gray-dark: #6b6b6b;
+            --gray-light: #d1d1d1;
+            --error: #ff5252;
+            --success: #4caf50;
+            --warning: #ffc107;
+            --info: #2196f3;
+            
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
         }
-      }
 
-      @media (max-width: 480px) {
-        .login-container {
-          padding: 30px 20px;
-          border-radius: 20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        h1 {
-          font-size: 22px;
+
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--black);
+            color: var(--white);
+            overflow: hidden;
+            touch-action: manipulation;
         }
-      }
+
+        /* ========== APP CONTAINER ========== */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            height: 100vh;
+            height: calc(100vh - var(--safe-top) - var(--safe-bottom));
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--black);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ========== STATUS BAR ========== */
+        .status-bar {
+            padding: 4px 16px 0 16px;
+            padding-top: var(--safe-top);
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--gray-dark);
+            background: var(--black);
+            flex-shrink: 0;
+            min-height: 20px;
+        }
+        .status-bar .time {
+            font-weight: 600;
+            color: var(--gray);
+        }
+        .status-bar .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .status-bar .connection-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-bar .connection-status .dot.online {
+            background: var(--success);
+        }
+        .status-bar .connection-status .dot.offline {
+            background: var(--error);
+        }
+
+        /* ========== HEADER ========== */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px 12px 16px;
+            background: var(--black);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            flex-shrink: 0;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-brand .icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--pink-dark), var(--gold-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--white);
+        }
+
+        .app-brand h1 {
+            font-size: 17px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-light), var(--pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .app-brand small {
+            display: block;
+            font-size: 9px;
+            color: var(--gray);
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .btn-icon {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: var(--gray);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .btn-icon:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-icon .spinning {
+            animation: spin 0.7s infinite linear;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .last-update {
+            font-size: 8px;
+            color: var(--gray-dark);
+            padding-right: 4px;
+        }
+
+        /* ========== CONTEÚDO ========== */
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px 16px 80px 16px;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        .app-content::-webkit-scrollbar {
+            width: 3px;
+        }
+        .app-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .app-content::-webkit-scrollbar-thumb {
+            background: var(--gold-dark);
+            border-radius: 10px;
+        }
+
+        /* ========== PULL-TO-REFRESH ========== */
+        .pull-indicator {
+            text-align: center;
+            padding: 8px 0;
+            font-size: 11px;
+            color: var(--gray-dark);
+            display: none;
+        }
+        .pull-indicator.active {
+            display: block;
+        }
+
+        /* ========== SEARCH BAR ========== */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 6px 14px;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+        .search-bar:focus-within {
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .search-bar i {
+            color: var(--gray-dark);
+            font-size: 16px;
+        }
+        .search-bar input {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--white);
+            font-size: 14px;
+            width: 100%;
+            padding: 8px 0;
+        }
+        .search-bar input::placeholder {
+            color: var(--gray-dark);
+        }
+        .search-bar .clear-btn {
+            color: var(--gray-dark);
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+        .search-bar .clear-btn.visible {
+            display: block;
+        }
+
+        /* ========== KPIs ========== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 14px 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .kpi-card:active {
+            transform: scale(0.97);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .kpi-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--pink), var(--gold));
+            opacity: 0.4;
+        }
+
+        .kpi-card .kpi-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--gray);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kpi-card .kpi-label i {
+            font-size: 12px;
+        }
+
+        .kpi-card .kpi-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 2px;
+            background: linear-gradient(135deg, var(--white), var(--gold-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+
+        .kpi-card .kpi-detail {
+            font-size: 9px;
+            color: var(--gray-dark);
+            margin-top: 2px;
+        }
+
+        .kpi-card.kpi-danger .kpi-value {
+            background: linear-gradient(135deg, var(--error), #ff8a80);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .kpi-card.kpi-success .kpi-value {
+            background: linear-gradient(135deg, var(--success), #a5d6a7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .kpi-card.kpi-warning .kpi-value {
+            background: linear-gradient(135deg, var(--warning), #ffe082);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* ========== SEÇÕES ========== */
+        .section {
+            margin-bottom: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-title i {
+            font-size: 16px;
+        }
+
+        .section-badge {
+            font-size: 10px;
+            color: var(--gray);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .section-badge:active {
+            transform: scale(0.95);
+        }
+
+        /* ========== ALERTAS ========== */
+        .alert-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .alert-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid var(--gray);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .alert-item:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .alert-item i {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .alert-item .alert-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        .alert-item .alert-tag {
+            font-size: 8px;
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        .alert-item.alert-high {
+            border-left-color: var(--error);
+        }
+        .alert-item.alert-high i {
+            color: var(--error);
+        }
+        .alert-item.alert-high .alert-tag {
+            background: rgba(255, 82, 82, 0.15);
+            color: var(--error);
+        }
+
+        .alert-item.alert-medium {
+            border-left-color: var(--warning);
+        }
+        .alert-item.alert-medium i {
+            color: var(--warning);
+        }
+        .alert-item.alert-medium .alert-tag {
+            background: rgba(255, 193, 7, 0.15);
+            color: var(--warning);
+        }
+
+        .alert-item.alert-low {
+            border-left-color: var(--info);
+        }
+        .alert-item.alert-low i {
+            color: var(--info);
+        }
+        .alert-item.alert-low .alert-tag {
+            background: rgba(33, 150, 243, 0.15);
+            color: var(--info);
+        }
+
+        /* ========== LISTAS INTERATIVAS ========== */
+        .list-wrapper {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            overflow: hidden;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            gap: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .list-item:active {
+            background: rgba(255, 255, 255, 0.06);
+            transform: scale(0.98);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item .item-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .list-item .item-title {
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .list-item .item-sub {
+            font-size: 10px;
+            color: var(--gray-dark);
+            margin-top: 1px;
+        }
+
+        .list-item .item-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .list-item .item-value {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .list-item .item-badge {
+            font-size: 9px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .list-item .item-arrow {
+            color: var(--gray-dark);
+            font-size: 14px;
+        }
+
+        /* Status badges */
+        .badge-status-em_costura {
+            background: rgba(33, 150, 243, 0.2);
+            color: #64b5f6;
+        }
+        .badge-status-costurado {
+            background: rgba(76, 175, 80, 0.2);
+            color: #a5d6a7;
+        }
+        .badge-status-entregue {
+            background: rgba(212, 160, 23, 0.2);
+            color: var(--gold-light);
+        }
+        .badge-status-recebido {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--gray);
+        }
+        .badge-status-cancelado {
+            background: rgba(255, 82, 82, 0.2);
+            color: #ff8a80;
+        }
+        .badge-status-parcialmente_entregue {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffb74d;
+        }
+        .badge-status-em_revisao {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffe082;
+        }
+
+        .item-danger .item-title {
+            color: var(--error);
+        }
+        .item-warning .item-title {
+            color: var(--warning);
+        }
+        .item-success .item-value {
+            color: var(--success);
+        }
+        .item-error .item-value {
+            color: var(--error);
+        }
+        .item-gold .item-value {
+            color: var(--gold-light);
+        }
+
+        /* ========== EMPTY STATE ========== */
+        .empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--gray-dark);
+        }
+
+        .empty-state i {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray);
+        }
+
+        .empty-state p {
+            font-size: 12px;
+        }
+
+        /* ========== LOADING ========== */
+        .loading-state {
+            text-align: center;
+            padding: 24px 0;
+            color: var(--gray);
+        }
+
+        .loading-state i {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 6px;
+            color: var(--gold-light);
+        }
+
+        .loading-state p {
+            font-size: 12px;
+        }
+
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 200;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-overlay .modal {
+            background: var(--black-soft);
+            border-radius: 24px 24px 0 0;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            padding: 20px 20px 30px 20px;
+            animation: slideUp 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal .modal-handle {
+            width: 36px;
+            height: 4px;
+            background: var(--gray-dark);
+            border-radius: 4px;
+            margin: 0 auto 16px auto;
+        }
+
+        .modal .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-shrink: 0;
+        }
+
+        .modal .modal-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal .modal-header h3 i {
+            font-size: 20px;
+        }
+
+        .modal .modal-close {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: var(--gray);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal .modal-close:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .modal .modal-body::-webkit-scrollbar {
+            width: 3px;
+        }
+        .modal .modal-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .modal .modal-body::-webkit-scrollbar-thumb {
+            background: var(--gold-dark);
+            border-radius: 10px;
+        }
+
+        /* ========== TAB BAR ========== */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0;
+            padding-bottom: calc(6px + var(--safe-bottom));
+            max-width: 500px;
+            margin: 0 auto;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            background: none;
+            border: none;
+            color: var(--gray-dark);
+            font-size: 9px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 4px 12px;
+            transition: all 0.2s;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .tab-item:active {
+            transform: scale(0.92);
+        }
+
+        .tab-item i {
+            font-size: 22px;
+            transition: all 0.2s;
+        }
+
+        .tab-item.active {
+            color: var(--gold-light);
+        }
+
+        .tab-item.active i {
+            color: var(--gold-light);
+            text-shadow: 0 0 12px rgba(212, 160, 23, 0.3);
+        }
+
+        .tab-item .tab-badge {
+            position: absolute;
+            top: 0;
+            right: 4px;
+            background: var(--error);
+            color: white;
+            font-size: 8px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid var(--black);
+        }
+
+        /* ========== SCROLL TOP ========== */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            background: rgba(212, 160, 23, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 160, 23, 0.2);
+            color: var(--gold-light);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 50;
+            max-width: 500px;
+            margin: 0 auto;
+            right: calc(50% - 250px + 16px);
+        }
+
+        .scroll-top-btn:active {
+            transform: scale(0.9);
+        }
+
+        .scroll-top-btn.visible {
+            display: flex;
+        }
+
+        /* ========== RESPONSIVIDADE ========== */
+        @media (max-width: 400px) {
+            .kpi-grid {
+                gap: 8px;
+            }
+            .kpi-card {
+                padding: 10px 10px;
+            }
+            .kpi-card .kpi-value {
+                font-size: 20px;
+            }
+            .app-content {
+                padding: 8px 12px 80px 12px;
+            }
+            .tab-item {
+                padding: 4px 8px;
+                font-size: 8px;
+            }
+            .tab-item i {
+                font-size: 20px;
+            }
+            .list-item {
+                padding: 8px 12px;
+            }
+            .list-item .item-title {
+                font-size: 12px;
+            }
+        }
+
+        @media (min-width: 501px) {
+            .app-container {
+                border-left: 1px solid rgba(255, 255, 255, 0.04);
+                border-right: 1px solid rgba(255, 255, 255, 0.04);
+            }
+            .tab-bar {
+                border-left: 1px solid rgba(255, 255, 255, 0.04);
+                border-right: 1px solid rgba(255, 255, 255, 0.04);
+            }
+            .modal-overlay .modal {
+                border-radius: 24px;
+                margin-bottom: 20px;
+                max-height: 80vh;
+            }
+        }
     </style>
-  </head>
-  <body>
-    <div class="login-container">
-      <div class="login-header">
-        <div class="logo-icon">🧵</div>
-        <h1>Facção Jeans</h1>
-        <p class="subtitle">Painel de Gestão de Costura</p>
-      </div>
+</head>
+<body>
 
-      <div id="errorMessage" class="error-message">
-        <span>⚠️</span> <span id="errorText"></span>
-      </div>
-
-      <div id="successMessage" class="success-message">
-        <span>✅</span> <span id="successText"></span>
-      </div>
-
-      <form id="loginForm">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            class="input-field"
-            placeholder="seu@email.com"
-            required
-            autocomplete="email"
-          />
+    <div class="app-container" id="app">
+        
+        <!-- STATUS BAR -->
+        <div class="status-bar">
+            <span id="statusTime">--:--</span>
+            <span class="connection-status">
+                <span class="dot" id="statusDot"></span>
+                <span id="statusText">Conectando...</span>
+            </span>
         </div>
 
-        <div class="form-group">
-          <label for="password">Senha</label>
-          <input
-            type="password"
-            id="password"
-            class="input-field"
-            placeholder="••••••••"
-            required
-            autocomplete="current-password"
-          />
-        </div>
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="app-brand">
+                <div class="icon"><i class="ph ph-scissors"></i></div>
+                <div>
+                    <h1>Facção Jeans</h1>
+                    <small>Visão do Gestor</small>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="last-update" id="lastUpdate">--:--</span>
+                <button class="btn-icon" id="btnRefresh" aria-label="Atualizar">
+                    <i class="ph ph-arrows-clockwise" id="refreshIcon"></i>
+                </button>
+            </div>
+        </header>
 
-        <button type="submit" id="loginButton" class="login-button">
-          <span id="buttonText">Entrar</span>
-          <span id="spinner" class="spinner" style="display: none"></span>
+        <!-- CONTEÚDO -->
+        <main class="app-content" id="appContent">
+
+            <!-- Pull-to-refresh -->
+            <div class="pull-indicator" id="pullIndicator">
+                <i class="ph ph-arrow-down"></i> Solte para atualizar
+            </div>
+
+            <!-- SEARCH -->
+            <div class="search-bar" id="searchBar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Buscar OS, cliente, funcionário..." />
+                <span class="clear-btn" id="clearSearch"><i class="ph ph-x"></i></span>
+            </div>
+
+            <!-- ===== CONTEÚDO DINÂMICO ===== -->
+            <div id="dynamicContent">
+                <!-- Renderizado via JavaScript -->
+            </div>
+
+            <!-- FOOTER -->
+            <div style="text-align:center;padding:12px 0 8px 0;font-size:9px;color:var(--gray-dark);">
+                <i class="ph ph-heart" style="color:var(--pink);"></i> Dados em tempo real
+            </div>
+
+        </main>
+
+        <!-- TAB BAR -->
+        <nav class="tab-bar" id="tabBar">
+            <button class="tab-item active" data-tab="geral" aria-label="Geral">
+                <i class="ph ph-squares-four"></i>
+                <span>Geral</span>
+            </button>
+            <button class="tab-item" data-tab="producao" aria-label="Produção">
+                <i class="ph ph-sewing-needle"></i>
+                <span>Produção</span>
+                <span class="tab-badge" id="tabBadgeProd" style="display:none;">0</span>
+            </button>
+            <button class="tab-item" data-tab="financeiro" aria-label="Financeiro">
+                <i class="ph ph-currency-circle-dollar"></i>
+                <span>Financeiro</span>
+                <span class="tab-badge" id="tabBadgeFin" style="display:none;">0</span>
+            </button>
+            <button class="tab-item" data-tab="rh" aria-label="RH">
+                <i class="ph ph-users-three"></i>
+                <span>RH</span>
+                <span class="tab-badge" id="tabBadgeRH" style="display:none;">0</span>
+            </button>
+            <button class="tab-item" data-tab="dividas" aria-label="Dívidas">
+                <i class="ph ph-warning-circle"></i>
+                <span>Dívidas</span>
+                <span class="tab-badge" id="tabBadgeDiv" style="display:none;">0</span>
+            </button>
+        </nav>
+
+        <!-- SCROLL TOP -->
+        <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Voltar ao topo">
+            <i class="ph ph-arrow-up"></i>
         </button>
 
-        <a href="#" class="forgot-link" id="forgotPasswordLink"
-          >Esqueceu a senha?</a
-        >
-      </form>
-
-      <div class="divider">ou</div>
-
-      <p class="footer-text">
-        Ambiente seguro • Todas as informações são criptografadas<br />
-        <span style="color: var(--gold-light)">Facção de Costura</span>
-      </p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="ph ph-info"></i> Detalhes</h3>
+                <button class="modal-close" id="modalClose"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Conteúdo dinâmico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCRIPT PRINCIPAL -->
+    <!-- ============================================================ -->
     <script>
-      (function () {
-        // Só executa se o Supabase estiver disponível
-        if (typeof window.supabase === "undefined") {
-          alert(
-            "Erro: biblioteca Supabase não carregou. Verifique sua internet.",
-          );
-          return;
-        }
+        (function() {
+            'use strict';
 
-        const SUPABASE_URL = "https://evlatdyxcgklunwvnhcv.supabase.co";
-        const SUPABASE_ANON_KEY =
-          "sb_publishable_tn2G-m8F7M3Ey8C0LDJLNg_9MzszdAS";
-        const supabase = window.supabase.createClient(
-          SUPABASE_URL,
-          SUPABASE_ANON_KEY,
-        );
+            console.log('🚀 App do Gestor Profissional iniciado');
 
-        const loginForm = document.getElementById("loginForm");
-        if (!loginForm) {
-          alert("Elemento do formulário não encontrado. Verifique o HTML.");
-          return;
-        }
+            // ============================================================
+            // SUPABASE
+            // ============================================================
+            const SUPABASE_URL = 'https://evlatdyxcgklunwvnhcv.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_tn2G-m8F7M3Ey8C0LDJLNg_9MzszdAS';
 
-        // --- Funções auxiliares (mesmas de antes) ---
-        const errorMessage = document.getElementById("errorMessage");
-        const errorText = document.getElementById("errorText");
-        const successMessage = document.getElementById("successMessage");
-        const successText = document.getElementById("successText");
-        const loginButton = document.getElementById("loginButton");
-        const buttonText = document.getElementById("buttonText");
-        const spinner = document.getElementById("spinner");
-        const forgotPasswordLink =
-          document.getElementById("forgotPasswordLink");
+            let supabaseClient;
 
-        function showError(msg) {
-          errorText.textContent = msg;
-          errorMessage.classList.add("visible");
-          successMessage.classList.remove("visible");
-        }
-        function showSuccess(msg) {
-          successText.textContent = msg;
-          successMessage.classList.add("visible");
-          errorMessage.classList.remove("visible");
-        }
-        function clearMessages() {
-          errorMessage.classList.remove("visible");
-          successMessage.classList.remove("visible");
-        }
-        function setLoading(loading) {
-          loginButton.disabled = loading;
-          buttonText.style.display = loading ? "none" : "inline";
-          spinner.style.display = loading ? "inline-block" : "none";
-        }
-
-        // --- Evento de login ---
-        loginForm.addEventListener("submit", async function (e) {
-          e.preventDefault(); // sempre impede o recarregamento
-          clearMessages();
-
-          const emailInput = document.getElementById("email");
-          const passwordInput = document.getElementById("password");
-          const email = emailInput.value.trim();
-          const password = passwordInput.value;
-
-          if (!email || !password) {
-            showError("Preencha todos os campos.");
-            return;
-          }
-
-          setLoading(true);
-          try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-              email,
-              password,
-            });
-
-            if (error) {
-              if (error.message.includes("Invalid login credentials")) {
-                showError("Email ou senha incorretos.");
-              } else if (error.message.includes("Email not confirmed")) {
-                showError(
-                  "Email não confirmado. Verifique sua caixa de entrada.",
-                );
-              } else {
-                showError(error.message);
-              }
-              console.error("Erro Supabase:", error);
-              return;
+            try {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Cliente Supabase criado');
+            } catch (e) {
+                console.error('❌ Erro ao criar cliente Supabase:', e);
+                if (typeof supabaseJs !== 'undefined') {
+                    supabaseClient = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    console.log('✅ Cliente Supabase criado via supabaseJs');
+                } else {
+                    throw new Error('Não foi possível criar o cliente Supabase');
+                }
             }
 
-            showSuccess("Login realizado! Redirecionando...");
-            setTimeout(() => {
-              window.location.href = "/sistema/sistema.html"; // ajuste o caminho
-            }, 800);
-          } catch (err) {
-            console.error("Erro inesperado:", err);
-            showError("Erro de conexão. Verifique sua internet.");
-          } finally {
-            setLoading(false);
-          }
-        });
-
-        // --- Esqueceu a senha ---
-        forgotPasswordLink.addEventListener("click", async function (e) {
-          e.preventDefault();
-          clearMessages();
-          const email = document.getElementById("email").value.trim();
-          if (!email) {
-            showError("Digite seu email no campo acima.");
-            return;
-          }
-          setLoading(true);
-          try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-              redirectTo:
-                window.location.origin + "/sistema/redefinir-senha.html",
-            });
-            if (error) {
-              showError(error.message);
-            } else {
-              showSuccess("Email de recuperação enviado!");
+            // ============================================================
+            // AUXILIARES
+            // ============================================================
+            function todayISO() {
+                return new Date().toISOString().split('T')[0];
             }
-          } catch (err) {
-            showError("Falha ao enviar email.");
-          } finally {
-            setLoading(false);
-          }
-        });
 
-        // --- Verificar sessão existente ---
-        (async function checkSession() {
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
-          if (session) {
-            window.location.href = "/sistema/sistema.html";
-          }
+            function formatDate(iso) {
+                if (!iso) return '-';
+                try {
+                    const d = new Date(iso + 'T00:00:00');
+                    return d.toLocaleDateString('pt-BR');
+                } catch { return iso; }
+            }
+
+            function formatDateTime(iso) {
+                if (!iso) return '-';
+                try {
+                    const d = new Date(iso);
+                    return d.toLocaleString('pt-BR');
+                } catch { return iso; }
+            }
+
+            function formatCurrency(v) {
+                if (v === null || v === undefined) v = 0;
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+            }
+
+            function formatStatus(s) {
+                const map = {
+                    recebido: 'Recebido',
+                    em_costura: 'Em Costura',
+                    costurado: 'Costurado',
+                    em_revisao: 'Em Revisão',
+                    entregue: 'Entregue',
+                    cancelado: 'Cancelado',
+                    parcialmente_entregue: 'Parcial'
+                };
+                return map[s] || s || '-';
+            }
+
+            function getStatusClass(s) {
+                return 'badge-status-' + s;
+            }
+
+            function formatTime() {
+                return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            function formatDateTimeFull() {
+                return new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            function capitalizeFirst(str) {
+                if (!str) return '';
+                return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ============================================================
+            // ELEMENTOS DOM
+            // ============================================================
+            const $ = (id) => document.getElementById(id);
+            const $$ = (sel) => document.querySelectorAll(sel);
+
+            const appContent = $('appContent');
+            const refreshIcon = $('refreshIcon');
+            const lastUpdate = $('lastUpdate');
+            const pullIndicator = $('pullIndicator');
+            const scrollTopBtn = $('scrollTopBtn');
+            const dynamicContent = $('dynamicContent');
+            const searchInput = $('searchInput');
+            const clearSearch = $('clearSearch');
+            const statusDot = $('statusDot');
+            const statusText = $('statusText');
+
+            // Modal
+            const modalOverlay = $('modalOverlay');
+            const modalTitle = $('modalTitle');
+            const modalBody = $('modalBody');
+            const modalClose = $('modalClose');
+
+            // ============================================================
+            // ESTADO
+            // ============================================================
+            let carregando = false;
+            let abaAtual = 'geral';
+            let termoBusca = '';
+            let dadosCache = {
+                osAtivas: [],
+                countOsAtivas: 0,
+                countAtrasadas: 0,
+                countEntreguesHoje: 0,
+                pecasHoje: 0,
+                receitas: 0,
+                despesas: 0,
+                contasVencidas: 0,
+                contasProximas: [],
+                qtdFuncionarios: 0,
+                ferias: [],
+                feriasEmAndamento: [],
+                parcelasDividas: [],
+                todasOS: [],
+                funcionarios: []
+            };
+            let conectado = false;
+
+            // ============================================================
+            // TESTE DE CONEXÃO
+            // ============================================================
+            async function testarConexao() {
+                console.log('🔄 Testando conexão...');
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('service_orders')
+                        .select('id')
+                        .limit(1);
+
+                    if (error) {
+                        console.error('❌ Erro na conexão:', error);
+                        statusDot.className = 'dot offline';
+                        statusText.textContent = 'Offline';
+                        return false;
+                    }
+                    console.log('✅ Conexão OK!');
+                    statusDot.className = 'dot online';
+                    statusText.textContent = 'Online';
+                    return true;
+                } catch (e) {
+                    console.error('❌ Exceção na conexão:', e);
+                    statusDot.className = 'dot offline';
+                    statusText.textContent = 'Offline';
+                    return false;
+                }
+            }
+
+            // ============================================================
+            // CARREGAMENTO DE DADOS
+            // ============================================================
+            async function carregarDados() {
+                console.log('🔄 Iniciando carregamento...');
+
+                if (carregando) {
+                    console.log('⏳ Já está carregando, ignorando...');
+                    return;
+                }
+                carregando = true;
+
+                refreshIcon.className = 'ph ph-spinner spinning';
+
+                try {
+                    const hoje = todayISO();
+                    console.log('📅 Data:', hoje);
+
+                    const dataFim7 = new Date();
+                    dataFim7.setDate(dataFim7.getDate() + 7);
+                    const dataFim7Str = dataFim7.toISOString().split('T')[0];
+
+                    const dataFim30 = new Date();
+                    dataFim30.setDate(dataFim30.getDate() + 30);
+                    const dataFim30Str = dataFim30.toISOString().split('T')[0];
+
+                    // ===== 1. OS Ativas =====
+                    const { data: osAtivas, count: countOsAtivas, error: errOs } = await supabaseClient
+                        .from('service_orders')
+                        .select('id, order_number, customer_id, total_quantity, status, expected_delivery, received_date, product_description, customers(company_name, trade_name)', { count: 'exact' })
+                        .not('status', 'in', '("entregue","cancelado")')
+                        .order('expected_delivery', { ascending: true })
+                        .limit(20);
+
+                    if (errOs) console.error('  ❌ Erro OS:', errOs);
+                    else console.log(`  ✅ ${countOsAtivas || 0} OS ativas`);
+
+                    // ===== 2. Todas OS (para busca) =====
+                    const { data: todasOS, error: errTodasOS } = await supabaseClient
+                        .from('service_orders')
+                        .select('id, order_number, customer_id, total_quantity, status, expected_delivery, received_date, product_description, customers(company_name, trade_name)')
+                        .not('status', 'in', '("cancelado")')
+                        .order('created_at', { ascending: false })
+                        .limit(50);
+
+                    if (errTodasOS) console.error('  ❌ Erro todas OS:', errTodasOS);
+
+                    // ===== 3. Funcionários =====
+                    const { data: funcionarios, error: errFuncs } = await supabaseClient
+                        .from('employees')
+                        .select('id, full_name, role, active, admission_date')
+                        .eq('active', true)
+                        .limit(50);
+
+                    if (errFuncs) console.error('  ❌ Erro funcionários:', errFuncs);
+                    else console.log(`  ✅ ${funcionarios?.length || 0} funcionários`);
+
+                    // ===== 4. Lotes atrasados =====
+                    const { count: countAtrasadas, error: errAtras } = await supabaseClient
+                        .from('service_orders')
+                        .select('id', { count: 'exact' })
+                        .not('status', 'in', '("entregue","cancelado")')
+                        .lt('expected_delivery', hoje);
+
+                    if (errAtras) console.error('  ❌ Erro atrasados:', errAtras);
+
+                    // ===== 5. Entregas hoje =====
+                    const { count: countEntreguesHoje, error: errEntr } = await supabaseClient
+                        .from('service_orders')
+                        .select('id', { count: 'exact' })
+                        .eq('status', 'entregue')
+                        .gte('updated_at', hoje)
+                        .lte('updated_at', hoje + 'T23:59:59');
+
+                    if (errEntr) console.error('  ❌ Erro entregas:', errEntr);
+
+                    // ===== 6. Produção hoje =====
+                    const { data: recordsHoje, error: errRec } = await supabaseClient
+                        .from('sewing_records')
+                        .select('pieces_sewn')
+                        .gte('start_time', hoje)
+                        .lte('start_time', hoje + 'T23:59:59');
+
+                    if (errRec) console.error('  ❌ Erro produção:', errRec);
+                    const pecasHoje = recordsHoje ? recordsHoje.reduce((s, r) => s + r.pieces_sewn, 0) : 0;
+
+                    // ===== 7. Financeiro - Saldo do mês =====
+                    const primeiroDiaMes = new Date();
+                    primeiroDiaMes.setDate(1);
+                    const primeiroDiaStr = primeiroDiaMes.toISOString().split('T')[0];
+                    const ultimoDiaMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+                    const ultimoDiaStr = ultimoDiaMes.toISOString().split('T')[0];
+
+                    const { data: transacoes, error: errTrans } = await supabaseClient
+                        .from('financial_transactions')
+                        .select('amount, type')
+                        .gte('date', primeiroDiaStr)
+                        .lte('date', ultimoDiaStr);
+
+                    let receitas = 0,
+                        despesas = 0;
+                    if (transacoes) {
+                        transacoes.forEach(t => {
+                            const v = parseFloat(t.amount);
+                            if (v > 0) receitas += v;
+                            else despesas += Math.abs(v);
+                        });
+                    }
+
+                    // ===== 8. Contas vencidas =====
+                    const { count: contasVencidas, error: errCV } = await supabaseClient
+                        .from('financial_transactions')
+                        .select('id', { count: 'exact' })
+                        .eq('status', 'pendente')
+                        .lt('due_date', hoje);
+
+                    if (errCV) console.error('  ❌ Erro contas vencidas:', errCV);
+
+                    // ===== 9. Contas próximas =====
+                    const { data: contasProximas, error: errCP } = await supabaseClient
+                        .from('financial_transactions')
+                        .select('id, description, amount, due_date, type, status, chart_of_accounts(name)')
+                        .eq('status', 'pendente')
+                        .gte('due_date', hoje)
+                        .lte('due_date', dataFim7Str)
+                        .order('due_date', { ascending: true })
+                        .limit(20);
+
+                    if (errCP) console.error('  ❌ Erro contas próximas:', errCP);
+
+                    // ===== 10. Funcionários ativos (count) =====
+                    const { count: qtdFuncionarios, error: errFunc } = await supabaseClient
+                        .from('employees')
+                        .select('id', { count: 'exact' })
+                        .eq('active', true);
+
+                    if (errFunc) console.error('  ❌ Erro funcionários:', errFunc);
+
+                    // ===== 11. Férias =====
+                    const { data: ferias, error: errFer } = await supabaseClient
+                        .from('employee_vacations')
+                        .select('id, employee_id, start_date, end_date, status, notes, employees(full_name)')
+                        .neq('status', 'cancelada')
+                        .order('start_date', { ascending: true })
+                        .limit(20);
+
+                    if (errFer) console.error('  ❌ Erro férias:', errFer);
+
+                    const feriasEmAndamento = ferias ? ferias.filter(f => {
+                        const hojeDate = new Date();
+                        const inicio = new Date(f.start_date);
+                        const fim = new Date(f.end_date);
+                        return f.status === 'agendada' && inicio <= hojeDate && fim >= hojeDate;
+                    }) : [];
+
+                    // ===== 12. Parcelas de dívidas =====
+                    const { data: parcelasDividas, error: errDiv } = await supabaseClient
+                        .from('debt_installments')
+                        .select('id, amount, due_date, installment_number, debts(id, creditor, type)')
+                        .eq('paid', false)
+                        .gte('due_date', hoje)
+                        .lte('due_date', dataFim30Str)
+                        .order('due_date', { ascending: true })
+                        .limit(20);
+
+                    if (errDiv) console.error('  ❌ Erro dívidas:', errDiv);
+
+                    // ============================================================
+                    // ARMAZENA CACHE
+                    // ============================================================
+                    dadosCache = {
+                        osAtivas: osAtivas || [],
+                        countOsAtivas: countOsAtivas || 0,
+                        countAtrasadas: countAtrasadas || 0,
+                        countEntreguesHoje: countEntreguesHoje || 0,
+                        pecasHoje: pecasHoje || 0,
+                        receitas: receitas || 0,
+                        despesas: despesas || 0,
+                        contasVencidas: contasVencidas || 0,
+                        contasProximas: contasProximas || [],
+                        qtdFuncionarios: qtdFuncionarios || 0,
+                        ferias: ferias || [],
+                        feriasEmAndamento: feriasEmAndamento || [],
+                        parcelasDividas: parcelasDividas || [],
+                        todasOS: todasOS || [],
+                        funcionarios: funcionarios || []
+                    };
+
+                    // ============================================================
+                    // RENDERIZA
+                    // ============================================================
+                    renderizarConteudo();
+
+                } catch (e) {
+                    console.error('❌ Erro geral:', e);
+                    dynamicContent.innerHTML = `
+                        <div class="alert-item alert-high" style="margin-top:16px;">
+                            <i class="ph ph-warning-circle" style="color:var(--error);"></i>
+                            <span class="alert-text"><strong>Erro ao carregar dados.</strong> ${e.message || 'Verifique sua conexão.'}</span>
+                            <button onclick="window.carregarDados()" style="background:var(--gold);border:none;border-radius:20px;padding:4px 12px;font-weight:600;cursor:pointer;color:#000;">Tentar</button>
+                        </div>
+                    `;
+                } finally {
+                    carregando = false;
+                    refreshIcon.className = 'ph ph-arrows-clockwise';
+                    pullIndicator.classList.remove('active');
+                    lastUpdate.textContent = formatTime();
+                }
+            }
+
+            // ============================================================
+            // RENDERIZAÇÃO DO CONTEÚDO
+            // ============================================================
+            function renderizarConteudo() {
+                const aba = abaAtual;
+                const busca = termoBusca.toLowerCase().trim();
+                let html = '';
+
+                // Filtra dados com base na busca
+                const filtrarOS = (lista) => {
+                    if (!busca) return lista;
+                    return lista.filter(os => {
+                        const cliente = (os.customers?.trade_name || os.customers?.company_name || '').toLowerCase();
+                        const numero = (os.order_number || '').toLowerCase();
+                        const produto = (os.product_description || '').toLowerCase();
+                        return cliente.includes(busca) || numero.includes(busca) || produto.includes(busca);
+                    });
+                };
+
+                const filtrarFerias = (lista) => {
+                    if (!busca) return lista;
+                    return lista.filter(f => {
+                        const nome = (f.employees?.full_name || '').toLowerCase();
+                        return nome.includes(busca);
+                    });
+                };
+
+                const filtrarContas = (lista) => {
+                    if (!busca) return lista;
+                    return lista.filter(c => {
+                        const desc = (c.description || '').toLowerCase();
+                        const cat = (c.chart_of_accounts?.name || '').toLowerCase();
+                        return desc.includes(busca) || cat.includes(busca);
+                    });
+                };
+
+                const filtrarDividas = (lista) => {
+                    if (!busca) return lista;
+                    return lista.filter(p => {
+                        const credor = (p.debts?.creditor || '').toLowerCase();
+                        return credor.includes(busca);
+                    });
+                };
+
+                const filtrarFuncionarios = (lista) => {
+                    if (!busca) return lista;
+                    return lista.filter(f => {
+                        const nome = (f.full_name || '').toLowerCase();
+                        const funcao = (f.role || '').toLowerCase();
+                        return nome.includes(busca) || funcao.includes(busca);
+                    });
+                };
+
+                switch (aba) {
+                    case 'geral':
+                        html = renderizarGeral();
+                        break;
+                    case 'producao':
+                        html = renderizarProducao(filtrarOS(dadosCache.osAtivas));
+                        break;
+                    case 'financeiro':
+                        html = renderizarFinanceiro(filtrarContas(dadosCache.contasProximas));
+                        break;
+                    case 'rh':
+                        html = renderizarRH(filtrarFerias(dadosCache.ferias), filtrarFuncionarios(dadosCache.funcionarios));
+                        break;
+                    case 'dividas':
+                        html = renderizarDividas(filtrarDividas(dadosCache.parcelasDividas));
+                        break;
+                }
+
+                dynamicContent.innerHTML = html;
+
+                // Atualiza badges da tab bar
+                atualizarBadges();
+            }
+
+            // ============================================================
+            // RENDERIZAÇÃO: GERAL
+            // ============================================================
+            function renderizarGeral() {
+                const d = dadosCache;
+                const saldo = d.receitas - d.despesas;
+
+                return `
+                    <!-- KPIs -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card" onclick="window.irAba('producao')">
+                            <div class="kpi-label"><i class="ph ph-sewing-needle"></i> Em Produção</div>
+                            <div class="kpi-value">${d.countOsAtivas}</div>
+                            <div class="kpi-detail">OS ativas</div>
+                        </div>
+                        <div class="kpi-card kpi-danger" onclick="window.irAba('financeiro')">
+                            <div class="kpi-label"><i class="ph ph-warning-circle"></i> Contas Vencidas</div>
+                            <div class="kpi-value">${d.contasVencidas}</div>
+                            <div class="kpi-detail">pendentes</div>
+                        </div>
+                        <div class="kpi-card kpi-warning" onclick="window.irAba('rh')">
+                            <div class="kpi-label"><i class="ph ph-sun"></i> Em Férias</div>
+                            <div class="kpi-value">${d.feriasEmAndamento.length}</div>
+                            <div class="kpi-detail">funcionários</div>
+                        </div>
+                        <div class="kpi-card ${saldo >= 0 ? 'kpi-success' : 'kpi-danger'}" onclick="window.irAba('financeiro')">
+                            <div class="kpi-label"><i class="ph ph-currency-circle-dollar"></i> Saldo Mês</div>
+                            <div class="kpi-value">${formatCurrency(saldo)}</div>
+                            <div class="kpi-detail">receitas - despesas</div>
+                        </div>
+                        <div class="kpi-card kpi-success" onclick="window.irAba('producao')">
+                            <div class="kpi-label"><i class="ph ph-check-circle"></i> Entregas Hoje</div>
+                            <div class="kpi-value">${d.countEntreguesHoje}</div>
+                            <div class="kpi-detail">lotes enviados</div>
+                        </div>
+                        <div class="kpi-card kpi-danger" onclick="window.irAba('dividas')">
+                            <div class="kpi-label"><i class="ph ph-timer"></i> Lotes Atrasados</div>
+                            <div class="kpi-value">${d.countAtrasadas}</div>
+                            <div class="kpi-detail">prazo vencido</div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title"><i class="ph ph-bell"></i> Alertas</div>
+                            <span class="section-badge">${contarAlertas()}</span>
+                        </div>
+                        <div class="alert-list">
+                            ${renderizarAlertas()}
+                        </div>
+                    </div>
+
+                    <!-- Resumo rápido -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-title"><i class="ph ph-info"></i> Resumo Rápido</div>
+                        </div>
+                        <div class="list-wrapper">
+                            <div class="list-item" onclick="window.irAba('producao')">
+                                <div class="item-main">
+                                    <div class="item-title">📦 OS em produção</div>
+                                    <div class="item-sub">${d.countOsAtivas} ordens ativas</div>
+                                </div>
+                                <div class="item-right">
+                                    <span class="item-value item-gold">${d.countOsAtivas}</span>
+                                    <div><i class="ph ph-caret-right item-arrow"></i></div>
+                                </div>
+                            </div>
+                            <div class="list-item" onclick="window.irAba('financeiro')">
+                                <div class="item-main">
+                                    <div class="item-title">💰 Contas a vencer</div>
+                                    <div class="item-sub">${d.contasProximas.length} contas nos próximos 7 dias</div>
+                                </div>
+                                <div class="item-right">
+                                    <span class="item-value ${d.contasProximas.length > 0 ? 'item-error' : 'item-success'}">${d.contasProximas.length}</span>
+                                    <div><i class="ph ph-caret-right item-arrow"></i></div>
+                                </div>
+                            </div>
+                            <div class="list-item" onclick="window.irAba('rh')">
+                                <div class="item-main">
+                                    <div class="item-title">👤 Funcionários</div>
+                                    <div class="item-sub">${d.qtdFuncionarios} ativos · ${d.feriasEmAndamento.length} em férias</div>
+                                </div>
+                                <div class="item-right">
+                                    <span class="item-value">${d.qtdFuncionarios}</span>
+                                    <div><i class="ph ph-caret-right item-arrow"></i></div>
+                                </div>
+                            </div>
+                            <div class="list-item" onclick="window.irAba('dividas')">
+                                <div class="item-main">
+                                    <div class="item-title">⚠️ Dívidas</div>
+                                    <div class="item-sub">${d.parcelasDividas.length} parcelas a vencer em 30 dias</div>
+                                </div>
+                                <div class="item-right">
+                                    <span class="item-value item-error">${d.parcelasDividas.length}</span>
+                                    <div><i class="ph ph-caret-right item-arrow"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ============================================================
+            // RENDERIZAÇÃO: PRODUÇÃO
+            // ============================================================
+            function renderizarProducao(osLista) {
+                const d = dadosCache;
+
+                if (osLista.length === 0) {
+                    return `
+                        <div class="empty-state">
+                            <i class="ph ph-sewing-needle"></i>
+                            <p>${termoBusca ? 'Nenhuma OS encontrada para "' + termoBusca + '"' : 'Nenhuma OS em produção'}</p>
+                        </div>
+                    `;
+                }
+
+                let html = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <span style="font-size:12px;color:var(--gray);">${osLista.length} OS em produção</span>
+                        <span style="font-size:11px;color:var(--gray-dark);">${d.countAtrasadas} atrasadas</span>
+                    </div>
+                    <div class="list-wrapper">
+                `;
+
+                osLista.forEach(os => {
+                    const cliente = os.customers?.trade_name || os.customers?.company_name || '-';
+                    const atrasado = new Date(os.expected_delivery) < new Date();
+                    const hoje = new Date();
+                    const diffDias = Math.ceil((new Date(os.expected_delivery) - hoje) / (1000 * 60 * 60 * 24));
+
+                    html += `
+                        <div class="list-item ${atrasado ? 'item-danger' : ''}" onclick="window.verDetalhesOS('${os.id}')">
+                            <div class="item-main">
+                                <div class="item-title">${os.order_number}</div>
+                                <div class="item-sub">${cliente} · ${os.total_quantity} peças</div>
+                            </div>
+                            <div class="item-right">
+                                <span class="item-badge ${getStatusClass(os.status)}">${formatStatus(os.status)}</span>
+                                <div style="font-size:9px;color:${atrasado ? 'var(--error)' : 'var(--gray-dark)'};margin-top:2px;">
+                                    ${formatDate(os.expected_delivery)}
+                                    ${atrasado ? ` ⚠️ ${Math.abs(diffDias)} dias` : diffDias > 0 ? ` (${diffDias} dias)` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                return html;
+            }
+
+            // ============================================================
+            // RENDERIZAÇÃO: FINANCEIRO
+            // ============================================================
+            function renderizarFinanceiro(contasLista) {
+                const d = dadosCache;
+
+                let html = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <span style="font-size:12px;color:var(--gray);">${contasLista.length} contas nos próximos 7 dias</span>
+                        <span style="font-size:11px;color:var(--gray-dark);">${d.contasVencidas} vencidas</span>
+                    </div>
+                    <div class="list-wrapper">
+                `;
+
+                if (contasLista.length === 0) {
+                    html += `
+                        <div class="empty-state">
+                            <i class="ph ph-currency-circle-dollar"></i>
+                            <p>${termoBusca ? 'Nenhuma conta encontrada para "' + termoBusca + '"' : 'Nenhuma conta a vencer nos próximos 7 dias'}</p>
+                        </div>
+                    `;
+                } else {
+                    contasLista.forEach(c => {
+                        const isReceber = c.type === 'receber';
+                        const diasFalta = Math.ceil((new Date(c.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+
+                        html += `
+                            <div class="list-item ${diasFalta <= 2 ? 'item-danger' : ''}" onclick="window.verDetalhesConta('${c.id}')">
+                                <div class="item-main">
+                                    <div class="item-title">${c.description || 'Sem descrição'}</div>
+                                    <div class="item-sub">${c.chart_of_accounts?.name || 'Sem categoria'} · ${formatDate(c.due_date)}</div>
+                                </div>
+                                <div class="item-right">
+                                    <div class="item-value ${isReceber ? 'item-success' : 'item-error'}">
+                                        ${isReceber ? '+' : '-'}${formatCurrency(Math.abs(c.amount))}
+                                    </div>
+                                    <div style="font-size:9px;color:${diasFalta <= 2 ? 'var(--error)' : 'var(--gray-dark)'};">
+                                        ${isReceber ? 'A Receber' : 'A Pagar'} · ${diasFalta} dias
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                html += `</div>`;
+
+                // Resumo financeiro
+                const saldo = d.receitas - d.despesas;
+                html += `
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;">
+                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;">
+                            <div style="font-size:9px;color:var(--gray);">Receitas</div>
+                            <div style="font-size:16px;font-weight:700;color:var(--success);">${formatCurrency(d.receitas)}</div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;">
+                            <div style="font-size:9px;color:var(--gray);">Despesas</div>
+                            <div style="font-size:16px;font-weight:700;color:var(--error);">${formatCurrency(d.despesas)}</div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;border:1px solid ${saldo >= 0 ? 'rgba(76,175,80,0.2)' : 'rgba(255,82,82,0.2)'};">
+                            <div style="font-size:9px;color:var(--gray);">Saldo</div>
+                            <div style="font-size:16px;font-weight:700;color:${saldo >= 0 ? 'var(--success)' : 'var(--error)'};">${formatCurrency(saldo)}</div>
+                        </div>
+                    </div>
+                `;
+
+                return html;
+            }
+
+            // ============================================================
+            // RENDERIZAÇÃO: RH
+            // ============================================================
+            function renderizarRH(feriasLista, funcionariosLista) {
+                const d = dadosCache;
+
+                let html = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <span style="font-size:12px;color:var(--gray);">${d.qtdFuncionarios} funcionários ativos</span>
+                        <span style="font-size:11px;color:var(--gray-dark);">${feriasLista.length} registros de férias</span>
+                    </div>
+                `;
+
+                // Funcionários em férias
+                html += `<div class="section-header"><div class="section-title" style="font-size:12px;"><i class="ph ph-sun"></i> Em Férias</div></div>`;
+                html += `<div class="list-wrapper">`;
+
+                const feriasAtivas = feriasLista.filter(f => f.status === 'agendada');
+                if (feriasAtivas.length === 0) {
+                    html += `
+                        <div class="empty-state">
+                            <i class="ph ph-sun"></i>
+                            <p>Nenhum funcionário em férias</p>
+                        </div>
+                    `;
+                } else {
+                    feriasAtivas.forEach(f => {
+                        const emAndamento = new Date(f.start_date) <= new Date() && new Date(f.end_date) >= new Date();
+                        const dias = Math.ceil((new Date(f.end_date) - new Date(f.start_date)) / (1000 * 60 * 60 * 24)) + 1;
+
+                        html += `
+                            <div class="list-item ${emAndamento ? 'item-warning' : ''}" onclick="window.verDetalhesFerias('${f.id}')">
+                                <div class="item-main">
+                                    <div class="item-title">${f.employees?.full_name || '-'}</div>
+                                    <div class="item-sub">${formatDate(f.start_date)} a ${formatDate(f.end_date)} · ${dias} dias</div>
+                                </div>
+                                <div class="item-right">
+                                    <span class="item-badge ${emAndamento ? 'badge-status-em_costura' : 'badge-status-recebido'}">
+                                        ${emAndamento ? 'Em andamento' : 'Agendada'}
+                                    </span>
+                                    <div><i class="ph ph-caret-right item-arrow"></i></div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                html += `</div>`;
+
+                // Funcionários
+                html += `<div class="section-header" style="margin-top:16px;"><div class="section-title" style="font-size:12px;"><i class="ph ph-users"></i> Todos os Funcionários</div></div>`;
+                html += `<div class="list-wrapper">`;
+
+                const funcsFiltradas = funcionariosLista.filter(f => f.active === true);
+                if (funcsFiltradas.length === 0) {
+                    html += `
+                        <div class="empty-state">
+                            <i class="ph ph-users"></i>
+                            <p>${termoBusca ? 'Nenhum funcionário encontrado para "' + termoBusca + '"' : 'Nenhum funcionário ativo'}</p>
+                        </div>
+                    `;
+                } else {
+                    funcsFiltradas.forEach(f => {
+                        html += `
+                            <div class="list-item" onclick="window.verDetalhesFuncionario('${f.id}')">
+                                <div class="item-main">
+                                    <div class="item-title">${f.full_name}</div>
+                                    <div class="item-sub">${f.role || 'Sem função'} · Admissão: ${formatDate(f.admission_date)}</div>
+                                </div>
+                                <div class="item-right">
+                                    <span class="item-badge badge-status-entregue">Ativo</span>
+                                    <div><i class="ph ph-caret-right item-arrow"></i></div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                html += `</div>`;
+
+                return html;
+            }
+
+            // ============================================================
+            // RENDERIZAÇÃO: DÍVIDAS
+            // ============================================================
+            function renderizarDividas(parcelasLista) {
+                const d = dadosCache;
+
+                let html = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <span style="font-size:12px;color:var(--gray);">${parcelasLista.length} parcelas a vencer em 30 dias</span>
+                        <span style="font-size:11px;color:var(--gray-dark);">Total: ${formatCurrency(parcelasLista.reduce((s, p) => s + parseFloat(p.amount), 0))}</span>
+                    </div>
+                    <div class="list-wrapper">
+                `;
+
+                if (parcelasLista.length === 0) {
+                    html += `
+                        <div class="empty-state">
+                            <i class="ph ph-warning-circle"></i>
+                            <p>${termoBusca ? 'Nenhuma parcela encontrada para "' + termoBusca + '"' : 'Nenhuma parcela a vencer nos próximos 30 dias'}</p>
+                        </div>
+                    `;
+                } else {
+                    parcelasLista.forEach(p => {
+                        const diasFalta = Math.ceil((new Date(p.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+                        const isUrgente = diasFalta <= 7;
+
+                        html += `
+                            <div class="list-item ${isUrgente ? 'item-danger' : ''}" onclick="window.verDetalhesParcela('${p.id}')">
+                                <div class="item-main">
+                                    <div class="item-title">${p.debts?.creditor || 'Credor não informado'}</div>
+                                    <div class="item-sub">${p.installment_number}ª parcela · ${formatDate(p.due_date)}</div>
+                                </div>
+                                <div class="item-right">
+                                    <div class="item-value item-error">${formatCurrency(p.amount)}</div>
+                                    <div style="font-size:9px;color:${isUrgente ? 'var(--error)' : 'var(--gray-dark)'};">
+                                        ${diasFalta} dias${isUrgente ? ' ⚠️' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                html += `</div>`;
+                return html;
+            }
+
+            // ============================================================
+            // ALERTAS
+            // ============================================================
+            function contarAlertas() {
+                const d = dadosCache;
+                let count = 0;
+                if (d.countAtrasadas > 0) count++;
+                if (d.contasVencidas > 0) count++;
+                if (d.feriasEmAndamento.length > 0) count++;
+                if (d.parcelasDividas.length > 0) count++;
+                return count;
+            }
+
+            function renderizarAlertas() {
+                const d = dadosCache;
+                const alertas = [];
+
+                if (d.countAtrasadas > 0) {
+                    alertas.push({ prioridade: 'high', icone: 'ph-warning-circle', texto: `${d.countAtrasadas} lote(s) atrasado(s)`, tag: 'urgente', acao: 'irAba("producao")' });
+                }
+                if (d.contasVencidas > 0) {
+                    alertas.push({ prioridade: 'high', icone: 'ph-currency-circle-dollar', texto: `${d.contasVencidas} conta(s) vencida(s)`, tag: 'urgente', acao: 'irAba("financeiro")' });
+                }
+                if (d.feriasEmAndamento.length > 0) {
+                    alertas.push({ prioridade: 'medium', icone: 'ph-sun', texto: `${d.feriasEmAndamento.length} funcionário(s) em férias`, tag: 'atenção', acao: 'irAba("rh")' });
+                }
+                if (d.parcelasDividas.length > 0) {
+                    alertas.push({ prioridade: 'medium', icone: 'ph-warning', texto: `${d.parcelasDividas.length} parcela(s) de dívidas vencem em 30 dias`, tag: 'atenção', acao: 'irAba("dividas")' });
+                }
+
+                if (alertas.length === 0) {
+                    return `
+                        <div class="alert-item alert-low">
+                            <i class="ph ph-check-circle" style="color:var(--success);"></i>
+                            <span class="alert-text">Tudo em dia! Nenhum alerta no momento. ✅</span>
+                        </div>
+                    `;
+                }
+
+                return alertas.map(a => `
+                    <div class="alert-item alert-${a.prioridade}" onclick="${a.acao}">
+                        <i class="ph ${a.icone}"></i>
+                        <span class="alert-text">${a.texto}</span>
+                        <span class="alert-tag tag-${a.prioridade}">${a.tag}</span>
+                    </div>
+                `).join('');
+            }
+
+            // ============================================================
+            // BADGES DA TAB BAR
+            // ============================================================
+            function atualizarBadges() {
+                const d = dadosCache;
+
+                const prodBadge = (d.countAtrasadas || 0) + (d.countOsAtivas > 0 ? 1 : 0);
+                const tabBadgeProd = $('tabBadgeProd');
+                tabBadgeProd.textContent = prodBadge > 0 ? prodBadge : 0;
+                tabBadgeProd.style.display = prodBadge > 0 ? 'flex' : 'none';
+
+                const tabBadgeFin = $('tabBadgeFin');
+                tabBadgeFin.textContent = d.contasVencidas || 0;
+                tabBadgeFin.style.display = d.contasVencidas > 0 ? 'flex' : 'none';
+
+                const tabBadgeRH = $('tabBadgeRH');
+                tabBadgeRH.textContent = d.feriasEmAndamento.length || 0;
+                tabBadgeRH.style.display = d.feriasEmAndamento.length > 0 ? 'flex' : 'none';
+
+                const tabBadgeDiv = $('tabBadgeDiv');
+                tabBadgeDiv.textContent = d.parcelasDividas.length || 0;
+                tabBadgeDiv.style.display = d.parcelasDividas.length > 0 ? 'flex' : 'none';
+            }
+
+            // ============================================================
+            // NAVEGAÇÃO ENTRE ABAS
+            // ============================================================
+            function irAba(aba) {
+                if (aba === abaAtual) {
+                    // Se já está na aba, recarrega os dados
+                    carregarDados();
+                    return;
+                }
+
+                abaAtual = aba;
+                document.querySelectorAll('.tab-item').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === aba);
+                });
+
+                // Limpa busca ao trocar de aba
+                termoBusca = '';
+                searchInput.value = '';
+                clearSearch.classList.remove('visible');
+
+                renderizarConteudo();
+                appContent.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // ============================================================
+            // MODAL - DETALHES
+            // ============================================================
+            function abrirModal(titulo, conteudo) {
+                modalTitle.innerHTML = titulo;
+                modalBody.innerHTML = conteudo;
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function fecharModal() {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // ============================================================
+            // DETALHES: OS
+            // ============================================================
+            async function verDetalhesOS(id) {
+                try {
+                    const { data: os, error } = await supabaseClient
+                        .from('service_orders')
+                        .select('*, customers(company_name, trade_name, contact_name, phone)')
+                        .eq('id', id)
+                        .single();
+
+                    if (error) throw error;
+
+                    const cliente = os.customers?.trade_name || os.customers?.company_name || '-';
+                    const valorTotal = os.total || os.total_quantity * os.unit_price;
+                    const atrasado = new Date(os.expected_delivery) < new Date();
+
+                    let html = `
+                        <div style="margin-bottom:16px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <h4 style="color:var(--gold-light);">${os.order_number}</h4>
+                                <span class="item-badge ${getStatusClass(os.status)}">${formatStatus(os.status)}</span>
+                            </div>
+                            <p style="color:var(--gray);font-size:12px;margin-top:4px;">${os.product_description || 'Sem descrição'}</p>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Cliente</div>
+                                <div style="font-weight:600;">${cliente}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Peças</div>
+                                <div style="font-weight:600;">${os.total_quantity} × ${formatCurrency(os.unit_price)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Recebimento</div>
+                                <div style="font-weight:600;">${formatDate(os.received_date)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;${atrasado ? 'border:1px solid var(--error);' : ''}">
+                                <div style="font-size:9px;color:var(--gray);">Prazo</div>
+                                <div style="font-weight:600;${atrasado ? 'color:var(--error);' : ''}">${formatDate(os.expected_delivery)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
+                                <div style="font-size:9px;color:var(--gray);">Valor Total</div>
+                                <div style="font-weight:700;font-size:18px;color:var(--gold-light);">${formatCurrency(valorTotal)}</div>
+                            </div>
+                        </div>
+                        ${os.notes ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;font-size:12px;color:var(--gray);"><strong>Obs:</strong> ${os.notes}</div>` : ''}
+                        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+                            <button onclick="window.irAba('producao');window.fecharModal();" style="flex:1;background:var(--gold);border:none;border-radius:10px;padding:10px;font-weight:600;color:#000;cursor:pointer;">Ver na Produção</button>
+                            <button onclick="window.fecharModal();" style="flex:1;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
+                        </div>
+                    `;
+
+                    abrirModal(`<i class="ph ph-files"></i> ${os.order_number}`, html);
+                } catch (e) {
+                    console.error('Erro ao buscar detalhes da OS:', e);
+                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes da OS.</p>`);
+                }
+            }
+
+            // ============================================================
+            // DETALHES: CONTA
+            // ============================================================
+            async function verDetalhesConta(id) {
+                try {
+                    const { data: conta, error } = await supabaseClient
+                        .from('financial_transactions')
+                        .select('*, chart_of_accounts(name, type)')
+                        .eq('id', id)
+                        .single();
+
+                    if (error) throw error;
+
+                    const isReceber = conta.type === 'receber';
+                    const diasFalta = Math.ceil((new Date(conta.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+
+                    let html = `
+                        <div style="margin-bottom:16px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <h4 style="color:${isReceber ? 'var(--success)' : 'var(--error)'};">${isReceber ? 'A Receber' : 'A Pagar'}</h4>
+                                <span style="font-size:12px;color:var(--gray);">${conta.status === 'pago' ? '✅ Pago' : '⏳ Pendente'}</span>
+                            </div>
+                            <p style="color:var(--white);font-size:14px;font-weight:600;margin-top:4px;">${conta.description || 'Sem descrição'}</p>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Categoria</div>
+                                <div style="font-weight:600;">${conta.chart_of_accounts?.name || '-'}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Vencimento</div>
+                                <div style="font-weight:600;${diasFalta <= 2 ? 'color:var(--error);' : ''}">${formatDate(conta.due_date)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
+                                <div style="font-size:9px;color:var(--gray);">Valor</div>
+                                <div style="font-weight:700;font-size:20px;color:${isReceber ? 'var(--success)' : 'var(--error)'};">${formatCurrency(Math.abs(conta.amount))}</div>
+                            </div>
+                        </div>
+                        ${conta.notes ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;font-size:12px;color:var(--gray);"><strong>Obs:</strong> ${conta.notes}</div>` : ''}
+                        <button onclick="window.fecharModal();" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
+                    `;
+
+                    abrirModal(`<i class="ph ph-currency-circle-dollar"></i> ${conta.description || 'Detalhes'}`, html);
+                } catch (e) {
+                    console.error('Erro ao buscar detalhes da conta:', e);
+                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes da conta.</p>`);
+                }
+            }
+
+            // ============================================================
+            // DETALHES: FÉRIAS
+            // ============================================================
+            async function verDetalhesFerias(id) {
+                try {
+                    const { data: ferias, error } = await supabaseClient
+                        .from('employee_vacations')
+                        .select('*, employees(full_name, role)')
+                        .eq('id', id)
+                        .single();
+
+                    if (error) throw error;
+
+                    const dias = Math.ceil((new Date(ferias.end_date) - new Date(ferias.start_date)) / (1000 * 60 * 60 * 24)) + 1;
+                    const emAndamento = new Date(ferias.start_date) <= new Date() && new Date(ferias.end_date) >= new Date();
+
+                    let html = `
+                        <div style="margin-bottom:16px;">
+                            <h4 style="color:var(--gold-light);">${ferias.employees?.full_name || 'Funcionário'}</h4>
+                            <p style="color:var(--gray);font-size:12px;">${ferias.employees?.role || 'Sem função'}</p>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Início</div>
+                                <div style="font-weight:600;">${formatDate(ferias.start_date)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Fim</div>
+                                <div style="font-weight:600;">${formatDate(ferias.end_date)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Dias</div>
+                                <div style="font-weight:600;">${dias} dias</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;${emAndamento ? 'border:1px solid var(--warning);' : ''}">
+                                <div style="font-size:9px;color:var(--gray);">Status</div>
+                                <div style="font-weight:600;${emAndamento ? 'color:var(--warning);' : ''}">${emAndamento ? '🟡 Em andamento' : ferias.status === 'agendada' ? '📅 Agendada' : '✅ Concluída'}</div>
+                            </div>
+                        </div>
+                        ${ferias.notes ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;font-size:12px;color:var(--gray);"><strong>Obs:</strong> ${ferias.notes}</div>` : ''}
+                        <button onclick="window.fecharModal();" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
+                    `;
+
+                    abrirModal(`<i class="ph ph-sun"></i> Férias - ${ferias.employees?.full_name || 'Funcionário'}`, html);
+                } catch (e) {
+                    console.error('Erro ao buscar detalhes das férias:', e);
+                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes das férias.</p>`);
+                }
+            }
+
+            // ============================================================
+            // DETALHES: FUNCIONÁRIO
+            // ============================================================
+            async function verDetalhesFuncionario(id) {
+                try {
+                    const { data: func, error } = await supabaseClient
+                        .from('employees')
+                        .select('*')
+                        .eq('id', id)
+                        .single();
+
+                    if (error) throw error;
+
+                    const { data: ferias } = await supabaseClient
+                        .from('employee_vacations')
+                        .select('*')
+                        .eq('employee_id', id)
+                        .eq('status', 'agendada')
+                        .order('start_date', { ascending: true });
+
+                    const feriasProx = ferias && ferias.length > 0 ? ferias[0] : null;
+
+                    let html = `
+                        <div style="margin-bottom:16px;">
+                            <h4 style="color:var(--gold-light);">${func.full_name}</h4>
+                            <p style="color:var(--gray);font-size:12px;">${func.role || 'Sem função'} · ${func.contract_type === 'clt' ? 'CLT' : 'Diarista'}</p>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Admissão</div>
+                                <div style="font-weight:600;">${formatDate(func.admission_date)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Status</div>
+                                <div style="font-weight:600;color:${func.active ? 'var(--success)' : 'var(--error)'};">${func.active ? '✅ Ativo' : '❌ Inativo'}</div>
+                            </div>
+                            ${func.phone_cell ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
+                                <div style="font-size:9px;color:var(--gray);">Contato</div>
+                                <div style="font-weight:600;">${func.phone_cell}</div>
+                            </div>` : ''}
+                            ${feriasProx ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;border:1px solid rgba(255,193,7,0.2);">
+                                <div style="font-size:9px;color:var(--gray);">Próximas Férias</div>
+                                <div style="font-weight:600;color:var(--warning);">${formatDate(feriasProx.start_date)} a ${formatDate(feriasProx.end_date)}</div>
+                            </div>` : ''}
+                        </div>
+                        <button onclick="window.fecharModal();" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
+                    `;
+
+                    abrirModal(`<i class="ph ph-user"></i> ${func.full_name}`, html);
+                } catch (e) {
+                    console.error('Erro ao buscar detalhes do funcionário:', e);
+                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes do funcionário.</p>`);
+                }
+            }
+
+            // ============================================================
+            // DETALHES: PARCELA
+            // ============================================================
+            async function verDetalhesParcela(id) {
+                try {
+                    const { data: parcela, error } = await supabaseClient
+                        .from('debt_installments')
+                        .select('*, debts(id, creditor, type, total_amount, status)')
+                        .eq('id', id)
+                        .single();
+
+                    if (error) throw error;
+
+                    const diasFalta = Math.ceil((new Date(parcela.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+
+                    let html = `
+                        <div style="margin-bottom:16px;">
+                            <h4 style="color:var(--gold-light);">${parcela.debts?.creditor || 'Credor não informado'}</h4>
+                            <p style="color:var(--gray);font-size:12px;">${parcela.debts?.type || 'Tipo não informado'} · ${parcela.debts?.status === 'ativa' ? '🟡 Ativa' : '✅ Quitada'}</p>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Parcela</div>
+                                <div style="font-weight:600;">${parcela.installment_number}ª</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Vencimento</div>
+                                <div style="font-weight:600;${diasFalta <= 7 ? 'color:var(--error);' : ''}">${formatDate(parcela.due_date)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
+                                <div style="font-size:9px;color:var(--gray);">Valor</div>
+                                <div style="font-weight:700;font-size:20px;color:var(--error);">${formatCurrency(parcela.amount)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
+                                <div style="font-size:9px;color:var(--gray);">Total da Dívida</div>
+                                <div style="font-weight:600;">${formatCurrency(parcela.debts?.total_amount || 0)}</div>
+                            </div>
+                        </div>
+                        <button onclick="window.fecharModal();" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
+                    `;
+
+                    abrirModal(`<i class="ph ph-warning-circle"></i> ${parcela.debts?.creditor || 'Parcela'}`, html);
+                } catch (e) {
+                    console.error('Erro ao buscar detalhes da parcela:', e);
+                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes da parcela.</p>`);
+                }
+            }
+
+            // ============================================================
+            // NAVEGAÇÃO E INTERAÇÃO
+            // ============================================================
+            // Expor funções globalmente para onclick
+            window.irAba = irAba;
+            window.fecharModal = fecharModal;
+            window.verDetalhesOS = verDetalhesOS;
+            window.verDetalhesConta = verDetalhesConta;
+            window.verDetalhesFerias = verDetalhesFerias;
+            window.verDetalhesFuncionario = verDetalhesFuncionario;
+            window.verDetalhesParcela = verDetalhesParcela;
+            window.carregarDados = carregarDados;
+
+            // ============================================================
+            // EVENTOS
+            // ============================================================
+            // Scroll to top
+            appContent.addEventListener('scroll', function() {
+                scrollTopBtn.classList.toggle('visible', this.scrollTop > 200);
+            });
+
+            scrollTopBtn.addEventListener('click', function() {
+                appContent.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Refresh
+            $('btnRefresh').addEventListener('click', carregarDados);
+
+            // Modal close
+            modalClose.addEventListener('click', fecharModal);
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === this) fecharModal();
+            });
+
+            // Search
+            searchInput.addEventListener('input', function() {
+                termoBusca = this.value.trim();
+                clearSearch.classList.toggle('visible', termoBusca.length > 0);
+                renderizarConteudo();
+            });
+
+            clearSearch.addEventListener('click', function() {
+                searchInput.value = '';
+                termoBusca = '';
+                clearSearch.classList.remove('visible');
+                renderizarConteudo();
+            });
+
+            // Tab bar
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    irAba(this.dataset.tab);
+                });
+            });
+
+            // Pull to refresh
+            let touchStartY = 0;
+            let touchMoved = false;
+
+            appContent.addEventListener('touchstart', function(e) {
+                if (this.scrollTop === 0) {
+                    touchStartY = e.touches[0].clientY;
+                    touchMoved = false;
+                }
+            }, { passive: true });
+
+            appContent.addEventListener('touchmove', function(e) {
+                if (this.scrollTop === 0 && touchStartY > 0) {
+                    const deltaY = e.touches[0].clientY - touchStartY;
+                    if (deltaY > 40) {
+                        touchMoved = true;
+                        pullIndicator.classList.add('active');
+                        pullIndicator.innerHTML = '<i class="ph ph-arrow-down"></i> Solte para atualizar';
+                    } else if (deltaY > 10) {
+                        pullIndicator.classList.add('active');
+                        pullIndicator.innerHTML = '<i class="ph ph-arrow-down"></i> Puxe para atualizar';
+                    } else {
+                        pullIndicator.classList.remove('active');
+                    }
+                }
+            }, { passive: true });
+
+            appContent.addEventListener('touchend', function(e) {
+                if (touchMoved && this.scrollTop === 0) {
+                    pullIndicator.innerHTML = '<i class="ph ph-spinner spinning"></i> Atualizando...';
+                    carregarDados().then(() => {
+                        pullIndicator.classList.remove('active');
+                    });
+                }
+                touchStartY = 0;
+                touchMoved = false;
+            }, { passive: true });
+
+            // ============================================================
+            // INICIALIZAÇÃO
+            // ============================================================
+            document.addEventListener('DOMContentLoaded', async function() {
+                console.log('🚀 App iniciado');
+
+                conectado = await testarConexao();
+                await carregarDados();
+
+                // Atualização automática a cada 60 segundos
+                setInterval(async () => {
+                    if (navigator.onLine) {
+                        await carregarDados();
+                    } else {
+                        statusDot.className = 'dot offline';
+                        statusText.textContent = 'Offline';
+                    }
+                }, 60000);
+
+                // Monitora conectividade
+                window.addEventListener('online', async function() {
+                    statusDot.className = 'dot online';
+                    statusText.textContent = 'Online';
+                    await carregarDados();
+                });
+
+                window.addEventListener('offline', function() {
+                    statusDot.className = 'dot offline';
+                    statusText.textContent = 'Offline';
+                });
+            });
+
+            console.log('✅ App Profissional pronto!');
+            console.log('💡 Funcionalidades:');
+            console.log('  • Clique em qualquer item para ver detalhes');
+            console.log('  • Use a busca para filtrar dados');
+            console.log('  • Puxe para baixo para atualizar');
+            console.log('  • Navegue pelas abas inferiores');
+
         })();
-      })();
     </script>
-  </body>
+
+</body>
 </html>
