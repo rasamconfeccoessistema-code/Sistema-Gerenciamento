@@ -1,1545 +1,1680 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="theme-color" content="#0a0a0a" />
     <title>Facção Jeans - App do Gestor</title>
-    
+
     <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* ============================================================
+      /* ============================================================
            APP MOBILE PROFISSIONAL - FACÇÃO JEANS
            ============================================================ */
-        
-        :root {
-            --pink: #e91e63;
-            --pink-dark: #c2185b;
-            --gold: #d4a017;
-            --gold-light: #f0c75e;
-            --black: #0a0a0a;
-            --black-soft: #141414;
-            --black-medium: #1e1e1e;
-            --white: #f5f5f5;
-            --gray: #9e9e9e;
-            --gray-dark: #6b6b6b;
-            --gray-light: #d1d1d1;
-            --error: #ff5252;
-            --success: #4caf50;
-            --warning: #ffc107;
-            --info: #2196f3;
-            
-            --safe-top: env(safe-area-inset-top, 0px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-        }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+      :root {
+        --pink: #e91e63;
+        --pink-dark: #c2185b;
+        --gold: #d4a017;
+        --gold-light: #f0c75e;
+        --black: #0a0a0a;
+        --black-soft: #141414;
+        --black-medium: #1e1e1e;
+        --white: #f5f5f5;
+        --gray: #9e9e9e;
+        --gray-dark: #6b6b6b;
+        --gray-light: #d1d1d1;
+        --error: #ff5252;
+        --success: #4caf50;
+        --warning: #ffc107;
+        --info: #2196f3;
 
-        html, body {
-            height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--black);
-            color: var(--white);
-            overflow: hidden;
-            touch-action: manipulation;
-        }
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+      }
 
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            height: 100vh;
-            height: calc(100vh - var(--safe-top) - var(--safe-bottom));
-            max-width: 500px;
-            margin: 0 auto;
-            background: var(--black);
-            position: relative;
-            overflow: hidden;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        /* ========== STATUS BAR ========== */
-        .status-bar {
-            padding: 4px 16px 0 16px;
-            padding-top: var(--safe-top);
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            color: var(--gray-dark);
-            background: var(--black);
-            flex-shrink: 0;
-            min-height: 20px;
-        }
-        .status-bar .time {
-            font-weight: 600;
-            color: var(--gray);
-        }
-        .status-bar .connection-status {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .status-bar .connection-status .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .status-bar .connection-status .dot.online {
-            background: var(--success);
-        }
-        .status-bar .connection-status .dot.offline {
-            background: var(--error);
-        }
+      html,
+      body {
+        height: 100%;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--black);
+        color: var(--white);
+        overflow: hidden;
+        touch-action: manipulation;
+      }
 
-        /* ========== HEADER ========== */
-        .app-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 16px 12px 16px;
-            background: var(--black);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            flex-shrink: 0;
-        }
+      .app-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        height: 100vh;
+        height: calc(100vh - var(--safe-top) - var(--safe-bottom));
+        max-width: 500px;
+        margin: 0 auto;
+        background: var(--black);
+        position: relative;
+        overflow: hidden;
+      }
 
-        .app-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+      /* ========== STATUS BAR ========== */
+      .status-bar {
+        padding: 4px 16px 0 16px;
+        padding-top: var(--safe-top);
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: var(--gray-dark);
+        background: var(--black);
+        flex-shrink: 0;
+        min-height: 20px;
+      }
+      .status-bar .time {
+        font-weight: 600;
+        color: var(--gray);
+      }
+      .status-bar .connection-status {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .status-bar .connection-status .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .status-bar .connection-status .dot.online {
+        background: var(--success);
+      }
+      .status-bar .connection-status .dot.offline {
+        background: var(--error);
+      }
 
-        .app-brand .icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--pink-dark), var(--gold-dark));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: var(--white);
-        }
+      /* ========== HEADER ========== */
+      .app-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 16px 12px 16px;
+        background: var(--black);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        flex-shrink: 0;
+      }
 
-        .app-brand h1 {
-            font-size: 17px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--gold-light), var(--pink));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            line-height: 1.2;
-        }
+      .app-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-        .app-brand small {
-            display: block;
-            font-size: 9px;
-            color: var(--gray);
-            font-weight: 400;
-        }
+      .app-brand .icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--pink-dark), var(--gold-dark));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: var(--white);
+      }
 
-        .header-actions {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
+      .app-brand h1 {
+        font-size: 17px;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--gold-light), var(--pink));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        line-height: 1.2;
+      }
 
-        .btn-icon {
-            background: rgba(255, 255, 255, 0.05);
-            border: none;
-            color: var(--gray);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            position: relative;
-        }
+      .app-brand small {
+        display: block;
+        font-size: 9px;
+        color: var(--gray);
+        font-weight: 400;
+      }
 
-        .btn-icon:active {
-            transform: scale(0.92);
-            background: rgba(255, 255, 255, 0.1);
-        }
+      .header-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
 
-        .btn-icon .spinning {
-            animation: spin 0.7s infinite linear;
-        }
+      .btn-icon {
+        background: rgba(255, 255, 255, 0.05);
+        border: none;
+        color: var(--gray);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        position: relative;
+      }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+      .btn-icon:active {
+        transform: scale(0.92);
+        background: rgba(255, 255, 255, 0.1);
+      }
 
-        .last-update {
-            font-size: 8px;
-            color: var(--gray-dark);
-            padding-right: 4px;
-        }
+      .btn-icon .spinning {
+        animation: spin 0.7s infinite linear;
+      }
 
-        /* ========== CONTEÚDO ========== */
-        .app-content {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 12px 16px 80px 16px;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
+      }
 
-        .app-content::-webkit-scrollbar {
-            width: 3px;
-        }
-        .app-content::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .app-content::-webkit-scrollbar-thumb {
-            background: var(--gold-dark);
-            border-radius: 10px;
-        }
+      .last-update {
+        font-size: 8px;
+        color: var(--gray-dark);
+        padding-right: 4px;
+      }
 
-        /* ========== PULL-TO-REFRESH ========== */
-        .pull-indicator {
-            text-align: center;
-            padding: 8px 0;
-            font-size: 11px;
-            color: var(--gray-dark);
-            display: none;
-        }
-        .pull-indicator.active {
-            display: block;
-        }
+      /* ========== CONTEÚDO ========== */
+      .app-content {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 12px 16px 80px 16px;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+      }
 
-        /* ========== SEARCH BAR ========== */
-        .search-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            padding: 6px 14px;
-            margin-bottom: 16px;
-            transition: all 0.2s;
-        }
-        .search-bar:focus-within {
-            border-color: var(--gold);
-            background: rgba(255, 255, 255, 0.06);
-        }
-        .search-bar i {
-            color: var(--gray-dark);
-            font-size: 16px;
-        }
-        .search-bar input {
-            background: none;
-            border: none;
-            outline: none;
-            color: var(--white);
-            font-size: 14px;
-            width: 100%;
-            padding: 8px 0;
-        }
-        .search-bar input::placeholder {
-            color: var(--gray-dark);
-        }
-        .search-bar .clear-btn {
-            color: var(--gray-dark);
-            cursor: pointer;
-            font-size: 14px;
-            display: none;
-        }
-        .search-bar .clear-btn.visible {
-            display: block;
-        }
+      .app-content::-webkit-scrollbar {
+        width: 3px;
+      }
+      .app-content::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .app-content::-webkit-scrollbar-thumb {
+        background: var(--gold-dark);
+        border-radius: 10px;
+      }
 
-        /* ========== KPIs ========== */
+      /* ========== PULL-TO-REFRESH ========== */
+      .pull-indicator {
+        text-align: center;
+        padding: 8px 0;
+        font-size: 11px;
+        color: var(--gray-dark);
+        display: none;
+      }
+      .pull-indicator.active {
+        display: block;
+      }
+
+      /* ========== SEARCH BAR ========== */
+      .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 6px 14px;
+        margin-bottom: 16px;
+        transition: all 0.2s;
+      }
+      .search-bar:focus-within {
+        border-color: var(--gold);
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .search-bar i {
+        color: var(--gray-dark);
+        font-size: 16px;
+      }
+      .search-bar input {
+        background: none;
+        border: none;
+        outline: none;
+        color: var(--white);
+        font-size: 14px;
+        width: 100%;
+        padding: 8px 0;
+      }
+      .search-bar input::placeholder {
+        color: var(--gray-dark);
+      }
+      .search-bar .clear-btn {
+        color: var(--gray-dark);
+        cursor: pointer;
+        font-size: 14px;
+        display: none;
+      }
+      .search-bar .clear-btn.visible {
+        display: block;
+      }
+
+      /* ========== KPIs ========== */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .kpi-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 14px;
+        padding: 14px 12px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .kpi-card:active {
+        transform: scale(0.97);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .kpi-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--pink), var(--gold));
+        opacity: 0.4;
+      }
+
+      .kpi-card .kpi-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        color: var(--gray);
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .kpi-card .kpi-label i {
+        font-size: 12px;
+      }
+
+      .kpi-card .kpi-value {
+        font-size: 24px;
+        font-weight: 800;
+        margin-top: 2px;
+        background: linear-gradient(135deg, var(--white), var(--gold-light));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        line-height: 1.2;
+      }
+
+      .kpi-card .kpi-detail {
+        font-size: 9px;
+        color: var(--gray-dark);
+        margin-top: 2px;
+      }
+
+      .kpi-card.kpi-danger .kpi-value {
+        background: linear-gradient(135deg, var(--error), #ff8a80);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .kpi-card.kpi-success .kpi-value {
+        background: linear-gradient(135deg, var(--success), #a5d6a7);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .kpi-card.kpi-warning .kpi-value {
+        background: linear-gradient(135deg, var(--warning), #ffe082);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      /* ========== SEÇÕES ========== */
+      .section {
+        margin-bottom: 16px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--gold-light);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .section-title i {
+        font-size: 16px;
+      }
+
+      .section-badge {
+        font-size: 10px;
+        color: var(--gray);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2px 10px;
+        border-radius: 20px;
+        cursor: pointer;
+      }
+
+      .section-badge:active {
+        transform: scale(0.95);
+      }
+
+      /* ========== FILTROS RÁPIDOS ========== */
+      .filter-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 12px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .filter-tabs::-webkit-scrollbar {
+        height: 2px;
+      }
+      .filter-tabs::-webkit-scrollbar-thumb {
+        background: var(--gold-dark);
+        border-radius: 10px;
+      }
+
+      .filter-tab {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 20px;
+        padding: 4px 14px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--gray);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .filter-tab:active {
+        transform: scale(0.95);
+      }
+      .filter-tab.active {
+        background: rgba(212, 160, 23, 0.15);
+        border-color: var(--gold);
+        color: var(--gold-light);
+      }
+
+      /* ========== ALERTAS ========== */
+      .alert-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .alert-item {
+        background: rgba(255, 255, 255, 0.02);
+        border-left: 3px solid var(--gray);
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .alert-item:active {
+        transform: scale(0.98);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .alert-item i {
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+
+      .alert-item .alert-text {
+        flex: 1;
+        line-height: 1.3;
+      }
+
+      .alert-item .alert-tag {
+        font-size: 8px;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+        flex-shrink: 0;
+      }
+
+      .alert-item.alert-high {
+        border-left-color: var(--error);
+      }
+      .alert-item.alert-high i {
+        color: var(--error);
+      }
+      .alert-item.alert-high .alert-tag {
+        background: rgba(255, 82, 82, 0.15);
+        color: var(--error);
+      }
+
+      .alert-item.alert-medium {
+        border-left-color: var(--warning);
+      }
+      .alert-item.alert-medium i {
+        color: var(--warning);
+      }
+      .alert-item.alert-medium .alert-tag {
+        background: rgba(255, 193, 7, 0.15);
+        color: var(--warning);
+      }
+
+      .alert-item.alert-low {
+        border-left-color: var(--info);
+      }
+      .alert-item.alert-low i {
+        color: var(--info);
+      }
+      .alert-item.alert-low .alert-tag {
+        background: rgba(33, 150, 243, 0.15);
+        color: var(--info);
+      }
+
+      /* ========== LISTAS INTERATIVAS ========== */
+      .list-wrapper {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        overflow: hidden;
+      }
+
+      .list-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        gap: 10px;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .list-item:active {
+        background: rgba(255, 255, 255, 0.06);
+        transform: scale(0.98);
+      }
+
+      .list-item:last-child {
+        border-bottom: none;
+      }
+
+      .list-item .item-main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .list-item .item-title {
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .list-item .item-sub {
+        font-size: 10px;
+        color: var(--gray-dark);
+        margin-top: 1px;
+      }
+
+      .list-item .item-right {
+        text-align: right;
+        flex-shrink: 0;
+      }
+
+      .list-item .item-value {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .list-item .item-badge {
+        font-size: 9px;
+        font-weight: 600;
+        padding: 2px 10px;
+        border-radius: 20px;
+        display: inline-block;
+      }
+
+      .list-item .item-arrow {
+        color: var(--gray-dark);
+        font-size: 14px;
+      }
+
+      /* Status badges */
+      .badge-status-em_costura {
+        background: rgba(33, 150, 243, 0.2);
+        color: #64b5f6;
+      }
+      .badge-status-costurado {
+        background: rgba(76, 175, 80, 0.2);
+        color: #a5d6a7;
+      }
+      .badge-status-entregue {
+        background: rgba(212, 160, 23, 0.2);
+        color: var(--gold-light);
+      }
+      .badge-status-recebido {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--gray);
+      }
+      .badge-status-cancelado {
+        background: rgba(255, 82, 82, 0.2);
+        color: #ff8a80;
+      }
+      .badge-status-parcialmente_entregue {
+        background: rgba(255, 152, 0, 0.2);
+        color: #ffb74d;
+      }
+      .badge-status-em_revisao {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffe082;
+      }
+
+      .badge-pago {
+        background: rgba(76, 175, 80, 0.15);
+        color: #a5d6a7;
+      }
+      .badge-pendente {
+        background: rgba(255, 193, 7, 0.15);
+        color: #ffe082;
+      }
+      .badge-vencido {
+        background: rgba(255, 82, 82, 0.15);
+        color: #ff8a80;
+      }
+
+      .item-danger .item-title {
+        color: var(--error);
+      }
+      .item-warning .item-title {
+        color: var(--warning);
+      }
+      .item-success .item-value {
+        color: var(--success);
+      }
+      .item-error .item-value {
+        color: var(--error);
+      }
+      .item-gold .item-value {
+        color: var(--gold-light);
+      }
+
+      /* ========== EMPTY STATE ========== */
+      .empty-state {
+        text-align: center;
+        padding: 32px 16px;
+        color: var(--gray-dark);
+      }
+
+      .empty-state i {
+        font-size: 32px;
+        display: block;
+        margin-bottom: 8px;
+        color: var(--gray);
+      }
+
+      .empty-state p {
+        font-size: 12px;
+      }
+
+      /* ========== LOADING ========== */
+      .loading-state {
+        text-align: center;
+        padding: 24px 0;
+        color: var(--gray);
+      }
+
+      .loading-state i {
+        font-size: 24px;
+        display: block;
+        margin-bottom: 6px;
+        color: var(--gold-light);
+      }
+
+      .loading-state p {
+        font-size: 12px;
+      }
+
+      /* ========== MODAL ========== */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        z-index: 200;
+        animation: fadeIn 0.25s ease;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal-overlay .modal {
+        background: var(--black-soft);
+        border-radius: 24px 24px 0 0;
+        max-width: 500px;
+        width: 100%;
+        max-height: 85vh;
+        padding: 20px 20px 30px 20px;
+        animation: slideUp 0.3s ease;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .modal .modal-handle {
+        width: 36px;
+        height: 4px;
+        background: var(--gray-dark);
+        border-radius: 4px;
+        margin: 0 auto 16px auto;
+      }
+
+      .modal .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        flex-shrink: 0;
+      }
+
+      .modal .modal-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--gold-light);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .modal .modal-header h3 i {
+        font-size: 20px;
+      }
+
+      .modal .modal-close {
+        background: rgba(255, 255, 255, 0.05);
+        border: none;
+        color: var(--gray);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal .modal-close:active {
+        transform: scale(0.9);
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .modal .modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .modal .modal-body::-webkit-scrollbar {
+        width: 3px;
+      }
+      .modal .modal-body::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .modal .modal-body::-webkit-scrollbar-thumb {
+        background: var(--gold-dark);
+        border-radius: 10px;
+      }
+
+      /* ========== TAB BAR ========== */
+      .tab-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 10, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        display: flex;
+        justify-content: space-around;
+        padding: 6px 0;
+        padding-bottom: calc(6px + var(--safe-bottom));
+        max-width: 500px;
+        margin: 0 auto;
+        z-index: 100;
+        flex-shrink: 0;
+      }
+
+      .tab-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        background: none;
+        border: none;
+        color: var(--gray-dark);
+        font-size: 9px;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 4px 12px;
+        transition: all 0.2s;
+        position: relative;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .tab-item:active {
+        transform: scale(0.92);
+      }
+
+      .tab-item i {
+        font-size: 22px;
+        transition: all 0.2s;
+      }
+
+      .tab-item.active {
+        color: var(--gold-light);
+      }
+
+      .tab-item.active i {
+        color: var(--gold-light);
+        text-shadow: 0 0 12px rgba(212, 160, 23, 0.3);
+      }
+
+      .tab-item .tab-badge {
+        position: absolute;
+        top: 0;
+        right: 4px;
+        background: var(--error);
+        color: white;
+        font-size: 8px;
+        font-weight: 700;
+        min-width: 16px;
+        height: 16px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        border: 2px solid var(--black);
+      }
+
+      /* ========== SCROLL TOP ========== */
+      .scroll-top-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 16px;
+        background: rgba(212, 160, 23, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(212, 160, 23, 0.2);
+        color: var(--gold-light);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        z-index: 50;
+        max-width: 500px;
+        margin: 0 auto;
+        right: calc(50% - 250px + 16px);
+      }
+
+      .scroll-top-btn:active {
+        transform: scale(0.9);
+      }
+
+      .scroll-top-btn.visible {
+        display: flex;
+      }
+
+      /* ========== RESPONSIVIDADE ========== */
+      @media (max-width: 400px) {
         .kpi-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
+          gap: 8px;
         }
-
         .kpi-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 14px 12px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.2s;
-            cursor: pointer;
+          padding: 10px 10px;
         }
-
-        .kpi-card:active {
-            transform: scale(0.97);
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .kpi-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--pink), var(--gold));
-            opacity: 0.4;
-        }
-
-        .kpi-card .kpi-label {
-            font-size: 9px;
-            text-transform: uppercase;
-            color: var(--gray);
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .kpi-card .kpi-label i {
-            font-size: 12px;
-        }
-
         .kpi-card .kpi-value {
-            font-size: 24px;
-            font-weight: 800;
-            margin-top: 2px;
-            background: linear-gradient(135deg, var(--white), var(--gold-light));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            line-height: 1.2;
+          font-size: 20px;
         }
-
-        .kpi-card .kpi-detail {
-            font-size: 9px;
-            color: var(--gray-dark);
-            margin-top: 2px;
+        .app-content {
+          padding: 8px 12px 80px 12px;
         }
-
-        .kpi-card.kpi-danger .kpi-value {
-            background: linear-gradient(135deg, var(--error), #ff8a80);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .kpi-card.kpi-success .kpi-value {
-            background: linear-gradient(135deg, var(--success), #a5d6a7);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .kpi-card.kpi-warning .kpi-value {
-            background: linear-gradient(135deg, var(--warning), #ffe082);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* ========== SEÇÕES ========== */
-        .section {
-            margin-bottom: 16px;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--gold-light);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .section-title i {
-            font-size: 16px;
-        }
-
-        .section-badge {
-            font-size: 10px;
-            color: var(--gray);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-
-        .section-badge:active {
-            transform: scale(0.95);
-        }
-
-        /* ========== FILTROS RÁPIDOS ========== */
-        .filter-tabs {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 12px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            -webkit-overflow-scrolling: touch;
-        }
-        .filter-tabs::-webkit-scrollbar {
-            height: 2px;
-        }
-        .filter-tabs::-webkit-scrollbar-thumb {
-            background: var(--gold-dark);
-            border-radius: 10px;
-        }
-
-        .filter-tab {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
-            padding: 4px 14px;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--gray);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .filter-tab:active {
-            transform: scale(0.95);
-        }
-        .filter-tab.active {
-            background: rgba(212, 160, 23, 0.15);
-            border-color: var(--gold);
-            color: var(--gold-light);
-        }
-
-        /* ========== ALERTAS ========== */
-        .alert-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .alert-item {
-            background: rgba(255, 255, 255, 0.02);
-            border-left: 3px solid var(--gray);
-            border-radius: 10px;
-            padding: 10px 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 12px;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .alert-item:active {
-            transform: scale(0.98);
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .alert-item i {
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        .alert-item .alert-text {
-            flex: 1;
-            line-height: 1.3;
-        }
-
-        .alert-item .alert-tag {
-            font-size: 8px;
-            text-transform: uppercase;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 20px;
-            flex-shrink: 0;
-        }
-
-        .alert-item.alert-high {
-            border-left-color: var(--error);
-        }
-        .alert-item.alert-high i {
-            color: var(--error);
-        }
-        .alert-item.alert-high .alert-tag {
-            background: rgba(255, 82, 82, 0.15);
-            color: var(--error);
-        }
-
-        .alert-item.alert-medium {
-            border-left-color: var(--warning);
-        }
-        .alert-item.alert-medium i {
-            color: var(--warning);
-        }
-        .alert-item.alert-medium .alert-tag {
-            background: rgba(255, 193, 7, 0.15);
-            color: var(--warning);
-        }
-
-        .alert-item.alert-low {
-            border-left-color: var(--info);
-        }
-        .alert-item.alert-low i {
-            color: var(--info);
-        }
-        .alert-item.alert-low .alert-tag {
-            background: rgba(33, 150, 243, 0.15);
-            color: var(--info);
-        }
-
-        /* ========== LISTAS INTERATIVAS ========== */
-        .list-wrapper {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            overflow: hidden;
-        }
-
-        .list-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            gap: 10px;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .list-item:active {
-            background: rgba(255, 255, 255, 0.06);
-            transform: scale(0.98);
-        }
-
-        .list-item:last-child {
-            border-bottom: none;
-        }
-
-        .list-item .item-main {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .list-item .item-title {
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .list-item .item-sub {
-            font-size: 10px;
-            color: var(--gray-dark);
-            margin-top: 1px;
-        }
-
-        .list-item .item-right {
-            text-align: right;
-            flex-shrink: 0;
-        }
-
-        .list-item .item-value {
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .list-item .item-badge {
-            font-size: 9px;
-            font-weight: 600;
-            padding: 2px 10px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-
-        .list-item .item-arrow {
-            color: var(--gray-dark);
-            font-size: 14px;
-        }
-
-        /* Status badges */
-        .badge-status-em_costura {
-            background: rgba(33, 150, 243, 0.2);
-            color: #64b5f6;
-        }
-        .badge-status-costurado {
-            background: rgba(76, 175, 80, 0.2);
-            color: #a5d6a7;
-        }
-        .badge-status-entregue {
-            background: rgba(212, 160, 23, 0.2);
-            color: var(--gold-light);
-        }
-        .badge-status-recebido {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--gray);
-        }
-        .badge-status-cancelado {
-            background: rgba(255, 82, 82, 0.2);
-            color: #ff8a80;
-        }
-        .badge-status-parcialmente_entregue {
-            background: rgba(255, 152, 0, 0.2);
-            color: #ffb74d;
-        }
-        .badge-status-em_revisao {
-            background: rgba(255, 193, 7, 0.2);
-            color: #ffe082;
-        }
-
-        .badge-pago {
-            background: rgba(76, 175, 80, 0.15);
-            color: #a5d6a7;
-        }
-        .badge-pendente {
-            background: rgba(255, 193, 7, 0.15);
-            color: #ffe082;
-        }
-        .badge-vencido {
-            background: rgba(255, 82, 82, 0.15);
-            color: #ff8a80;
-        }
-
-        .item-danger .item-title {
-            color: var(--error);
-        }
-        .item-warning .item-title {
-            color: var(--warning);
-        }
-        .item-success .item-value {
-            color: var(--success);
-        }
-        .item-error .item-value {
-            color: var(--error);
-        }
-        .item-gold .item-value {
-            color: var(--gold-light);
-        }
-
-        /* ========== EMPTY STATE ========== */
-        .empty-state {
-            text-align: center;
-            padding: 32px 16px;
-            color: var(--gray-dark);
-        }
-
-        .empty-state i {
-            font-size: 32px;
-            display: block;
-            margin-bottom: 8px;
-            color: var(--gray);
-        }
-
-        .empty-state p {
-            font-size: 12px;
-        }
-
-        /* ========== LOADING ========== */
-        .loading-state {
-            text-align: center;
-            padding: 24px 0;
-            color: var(--gray);
-        }
-
-        .loading-state i {
-            font-size: 24px;
-            display: block;
-            margin-bottom: 6px;
-            color: var(--gold-light);
-        }
-
-        .loading-state p {
-            font-size: 12px;
-        }
-
-        /* ========== MODAL ========== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-            z-index: 200;
-            animation: fadeIn 0.25s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-overlay .modal {
-            background: var(--black-soft);
-            border-radius: 24px 24px 0 0;
-            max-width: 500px;
-            width: 100%;
-            max-height: 85vh;
-            padding: 20px 20px 30px 20px;
-            animation: slideUp 0.3s ease;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal .modal-handle {
-            width: 36px;
-            height: 4px;
-            background: var(--gray-dark);
-            border-radius: 4px;
-            margin: 0 auto 16px auto;
-        }
-
-        .modal .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            flex-shrink: 0;
-        }
-
-        .modal .modal-header h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--gold-light);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .modal .modal-header h3 i {
-            font-size: 20px;
-        }
-
-        .modal .modal-close {
-            background: rgba(255, 255, 255, 0.05);
-            border: none;
-            color: var(--gray);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal .modal-close:active {
-            transform: scale(0.9);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .modal .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
-        .modal .modal-body::-webkit-scrollbar {
-            width: 3px;
-        }
-        .modal .modal-body::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .modal .modal-body::-webkit-scrollbar-thumb {
-            background: var(--gold-dark);
-            border-radius: 10px;
-        }
-
-        /* ========== TAB BAR ========== */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 10, 10, 0.92);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            display: flex;
-            justify-content: space-around;
-            padding: 6px 0;
-            padding-bottom: calc(6px + var(--safe-bottom));
-            max-width: 500px;
-            margin: 0 auto;
-            z-index: 100;
-            flex-shrink: 0;
-        }
-
         .tab-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1px;
-            background: none;
-            border: none;
-            color: var(--gray-dark);
-            font-size: 9px;
-            font-weight: 500;
-            cursor: pointer;
-            padding: 4px 12px;
-            transition: all 0.2s;
-            position: relative;
-            -webkit-tap-highlight-color: transparent;
+          padding: 4px 8px;
+          font-size: 8px;
         }
-
-        .tab-item:active {
-            transform: scale(0.92);
-        }
-
         .tab-item i {
-            font-size: 22px;
-            transition: all 0.2s;
+          font-size: 20px;
         }
+        .list-item {
+          padding: 8px 12px;
+        }
+        .list-item .item-title {
+          font-size: 12px;
+        }
+        .filter-tab {
+          font-size: 10px;
+          padding: 3px 10px;
+        }
+      }
 
-        .tab-item.active {
-            color: var(--gold-light);
+      @media (min-width: 501px) {
+        .app-container {
+          border-left: 1px solid rgba(255, 255, 255, 0.04);
+          border-right: 1px solid rgba(255, 255, 255, 0.04);
         }
-
-        .tab-item.active i {
-            color: var(--gold-light);
-            text-shadow: 0 0 12px rgba(212, 160, 23, 0.3);
+        .tab-bar {
+          border-left: 1px solid rgba(255, 255, 255, 0.04);
+          border-right: 1px solid rgba(255, 255, 255, 0.04);
         }
-
-        .tab-item .tab-badge {
-            position: absolute;
-            top: 0;
-            right: 4px;
-            background: var(--error);
-            color: white;
-            font-size: 8px;
-            font-weight: 700;
-            min-width: 16px;
-            height: 16px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4px;
-            border: 2px solid var(--black);
+        .modal-overlay .modal {
+          border-radius: 24px;
+          margin-bottom: 20px;
+          max-height: 80vh;
         }
-
-        /* ========== SCROLL TOP ========== */
-        .scroll-top-btn {
-            position: fixed;
-            bottom: 80px;
-            right: 16px;
-            background: rgba(212, 160, 23, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 160, 23, 0.2);
-            color: var(--gold-light);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 18px;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            z-index: 50;
-            max-width: 500px;
-            margin: 0 auto;
-            right: calc(50% - 250px + 16px);
-        }
-
-        .scroll-top-btn:active {
-            transform: scale(0.9);
-        }
-
-        .scroll-top-btn.visible {
-            display: flex;
-        }
-
-        /* ========== RESPONSIVIDADE ========== */
-        @media (max-width: 400px) {
-            .kpi-grid {
-                gap: 8px;
-            }
-            .kpi-card {
-                padding: 10px 10px;
-            }
-            .kpi-card .kpi-value {
-                font-size: 20px;
-            }
-            .app-content {
-                padding: 8px 12px 80px 12px;
-            }
-            .tab-item {
-                padding: 4px 8px;
-                font-size: 8px;
-            }
-            .tab-item i {
-                font-size: 20px;
-            }
-            .list-item {
-                padding: 8px 12px;
-            }
-            .list-item .item-title {
-                font-size: 12px;
-            }
-            .filter-tab {
-                font-size: 10px;
-                padding: 3px 10px;
-            }
-        }
-
-        @media (min-width: 501px) {
-            .app-container {
-                border-left: 1px solid rgba(255, 255, 255, 0.04);
-                border-right: 1px solid rgba(255, 255, 255, 0.04);
-            }
-            .tab-bar {
-                border-left: 1px solid rgba(255, 255, 255, 0.04);
-                border-right: 1px solid rgba(255, 255, 255, 0.04);
-            }
-            .modal-overlay .modal {
-                border-radius: 24px;
-                margin-bottom: 20px;
-                max-height: 80vh;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="app-container" id="app">
-        
-        <!-- STATUS BAR -->
-        <div class="status-bar">
-            <span id="statusTime">--:--</span>
-            <span class="connection-status">
-                <span class="dot" id="statusDot"></span>
-                <span id="statusText">Conectando...</span>
-            </span>
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <span id="statusTime">--:--</span>
+        <span class="connection-status">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">Conectando...</span>
+        </span>
+      </div>
+
+      <!-- HEADER -->
+      <header class="app-header">
+        <div class="app-brand">
+          <div class="icon"><i class="ph ph-scissors"></i></div>
+          <div>
+            <h1>Facção Jeans</h1>
+            <small>Visão do Gestor</small>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span class="last-update" id="lastUpdate">--:--</span>
+          <button class="btn-icon" id="btnRefresh" aria-label="Atualizar">
+            <i class="ph ph-arrows-clockwise" id="refreshIcon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTEÚDO -->
+      <main class="app-content" id="appContent">
+        <!-- Pull-to-refresh -->
+        <div class="pull-indicator" id="pullIndicator">
+          <i class="ph ph-arrow-down"></i> Solte para atualizar
         </div>
 
-        <!-- HEADER -->
-        <header class="app-header">
-            <div class="app-brand">
-                <div class="icon"><i class="ph ph-scissors"></i></div>
-                <div>
-                    <h1>Facção Jeans</h1>
-                    <small>Visão do Gestor</small>
-                </div>
-            </div>
-            <div class="header-actions">
-                <span class="last-update" id="lastUpdate">--:--</span>
-                <button class="btn-icon" id="btnRefresh" aria-label="Atualizar">
-                    <i class="ph ph-arrows-clockwise" id="refreshIcon"></i>
-                </button>
-            </div>
-        </header>
+        <!-- SEARCH -->
+        <div class="search-bar" id="searchBar">
+          <i class="ph ph-magnifying-glass"></i>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Buscar OS, cliente, funcionário..."
+          />
+          <span class="clear-btn" id="clearSearch"
+            ><i class="ph ph-x"></i
+          ></span>
+        </div>
 
-        <!-- CONTEÚDO -->
-        <main class="app-content" id="appContent">
+        <!-- ===== CONTEÚDO DINÂMICO ===== -->
+        <div id="dynamicContent">
+          <!-- Renderizado via JavaScript -->
+        </div>
 
-            <!-- Pull-to-refresh -->
-            <div class="pull-indicator" id="pullIndicator">
-                <i class="ph ph-arrow-down"></i> Solte para atualizar
-            </div>
+        <!-- FOOTER -->
+        <div
+          style="
+            text-align: center;
+            padding: 12px 0 8px 0;
+            font-size: 9px;
+            color: var(--gray-dark);
+          "
+        >
+          <i class="ph ph-heart" style="color: var(--pink)"></i> Dados em tempo
+          real
+        </div>
+      </main>
 
-            <!-- SEARCH -->
-            <div class="search-bar" id="searchBar">
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Buscar OS, cliente, funcionário..." />
-                <span class="clear-btn" id="clearSearch"><i class="ph ph-x"></i></span>
-            </div>
-
-            <!-- ===== CONTEÚDO DINÂMICO ===== -->
-            <div id="dynamicContent">
-                <!-- Renderizado via JavaScript -->
-            </div>
-
-            <!-- FOOTER -->
-            <div style="text-align:center;padding:12px 0 8px 0;font-size:9px;color:var(--gray-dark);">
-                <i class="ph ph-heart" style="color:var(--pink);"></i> Dados em tempo real
-            </div>
-
-        </main>
-
-        <!-- TAB BAR -->
-        <nav class="tab-bar" id="tabBar">
-            <button class="tab-item active" data-tab="geral" aria-label="Geral">
-                <i class="ph ph-squares-four"></i>
-                <span>Geral</span>
-            </button>
-            <button class="tab-item" data-tab="producao" aria-label="Produção">
-                <i class="ph ph-sewing-needle"></i>
-                <span>Produção</span>
-                <span class="tab-badge" id="tabBadgeProd" style="display:none;">0</span>
-            </button>
-            <button class="tab-item" data-tab="financeiro" aria-label="Financeiro">
-                <i class="ph ph-currency-circle-dollar"></i>
-                <span>Financeiro</span>
-                <span class="tab-badge" id="tabBadgeFin" style="display:none;">0</span>
-            </button>
-            <button class="tab-item" data-tab="rh" aria-label="RH">
-                <i class="ph ph-users-three"></i>
-                <span>RH</span>
-                <span class="tab-badge" id="tabBadgeRH" style="display:none;">0</span>
-            </button>
-            <button class="tab-item" data-tab="dividas" aria-label="Dívidas">
-                <i class="ph ph-warning-circle"></i>
-                <span>Dívidas</span>
-                <span class="tab-badge" id="tabBadgeDiv" style="display:none;">0</span>
-            </button>
-        </nav>
-
-        <!-- SCROLL TOP -->
-        <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Voltar ao topo">
-            <i class="ph ph-arrow-up"></i>
+      <!-- TAB BAR -->
+      <nav class="tab-bar" id="tabBar">
+        <button class="tab-item active" data-tab="geral" aria-label="Geral">
+          <i class="ph ph-squares-four"></i>
+          <span>Geral</span>
         </button>
+        <button class="tab-item" data-tab="producao" aria-label="Produção">
+          <i class="ph ph-sewing-needle"></i>
+          <span>Produção</span>
+          <span class="tab-badge" id="tabBadgeProd" style="display: none"
+            >0</span
+          >
+        </button>
+        <button class="tab-item" data-tab="financeiro" aria-label="Financeiro">
+          <i class="ph ph-currency-circle-dollar"></i>
+          <span>Financeiro</span>
+          <span class="tab-badge" id="tabBadgeFin" style="display: none"
+            >0</span
+          >
+        </button>
+        <button class="tab-item" data-tab="rh" aria-label="RH">
+          <i class="ph ph-users-three"></i>
+          <span>RH</span>
+          <span class="tab-badge" id="tabBadgeRH" style="display: none">0</span>
+        </button>
+        <button class="tab-item" data-tab="dividas" aria-label="Dívidas">
+          <i class="ph ph-warning-circle"></i>
+          <span>Dívidas</span>
+          <span class="tab-badge" id="tabBadgeDiv" style="display: none"
+            >0</span
+          >
+        </button>
+      </nav>
 
+      <!-- SCROLL TOP -->
+      <button
+        class="scroll-top-btn"
+        id="scrollTopBtn"
+        aria-label="Voltar ao topo"
+      >
+        <i class="ph ph-arrow-up"></i>
+      </button>
     </div>
 
     <!-- ===== MODAL ===== -->
     <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <div class="modal-handle"></div>
-            <div class="modal-header">
-                <h3 id="modalTitle"><i class="ph ph-info"></i> Detalhes</h3>
-                <button class="modal-close" id="modalClose"><i class="ph ph-x"></i></button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Conteúdo dinâmico -->
-            </div>
+      <div class="modal">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h3 id="modalTitle"><i class="ph ph-info"></i> Detalhes</h3>
+          <button class="modal-close" id="modalClose">
+            <i class="ph ph-x"></i>
+          </button>
         </div>
+        <div class="modal-body" id="modalBody">
+          <!-- Conteúdo dinâmico -->
+        </div>
+      </div>
     </div>
 
     <!-- ============================================================ -->
     <!-- SCRIPT PRINCIPAL -->
     <!-- ============================================================ -->
     <script>
-        (function() {
-            'use strict';
+      (function () {
+        "use strict";
 
-            console.log('🚀 App do Gestor Profissional iniciado');
+        console.log("🚀 App do Gestor Profissional iniciado");
+
+        // ============================================================
+        // SUPABASE
+        // ============================================================
+        const SUPABASE_URL = "https://evlatdyxcgklunwvnhcv.supabase.co";
+        const SUPABASE_ANON_KEY =
+          "sb_publishable_tn2G-m8F7M3Ey8C0LDJLNg_9MzszdAS";
+
+        let supabaseClient;
+
+        try {
+          supabaseClient = supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY,
+          );
+          console.log("✅ Cliente Supabase criado");
+        } catch (e) {
+          console.error("❌ Erro ao criar cliente Supabase:", e);
+          if (typeof supabaseJs !== "undefined") {
+            supabaseClient = supabaseJs.createClient(
+              SUPABASE_URL,
+              SUPABASE_ANON_KEY,
+            );
+            console.log("✅ Cliente Supabase criado via supabaseJs");
+          } else {
+            throw new Error("Não foi possível criar o cliente Supabase");
+          }
+        }
+
+        // ============================================================
+        // AUXILIARES
+        // ============================================================
+        function todayISO() {
+          return new Date().toISOString().split("T")[0];
+        }
+
+        function formatDate(iso) {
+          if (!iso) return "-";
+          try {
+            const d = new Date(iso + "T00:00:00");
+            return d.toLocaleDateString("pt-BR");
+          } catch {
+            return iso;
+          }
+        }
+
+        function formatDateTime(iso) {
+          if (!iso) return "-";
+          try {
+            const d = new Date(iso);
+            return d.toLocaleString("pt-BR");
+          } catch {
+            return iso;
+          }
+        }
+
+        function formatCurrency(v) {
+          if (v === null || v === undefined) v = 0;
+          return new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(v);
+        }
+
+        function formatStatus(s) {
+          const map = {
+            recebido: "Recebido",
+            em_costura: "Em Costura",
+            costurado: "Costurado",
+            em_revisao: "Em Revisão",
+            entregue: "Entregue",
+            cancelado: "Cancelado",
+            parcialmente_entregue: "Parcial",
+          };
+          return map[s] || s || "-";
+        }
+
+        function getStatusClass(s) {
+          return "badge-status-" + s;
+        }
+
+        function formatTime() {
+          return new Date().toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+
+        function formatDateTimeFull() {
+          return (
+            new Date().toLocaleDateString("pt-BR") +
+            " " +
+            new Date().toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          );
+        }
+
+        function capitalizeFirst(str) {
+          if (!str) return "";
+          return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        }
+
+        function escapeHtml(str) {
+          if (!str) return "";
+          const div = document.createElement("div");
+          div.textContent = str;
+          return div.innerHTML;
+        }
+
+        // ============================================================
+        // ELEMENTOS DOM
+        // ============================================================
+        const $ = (id) => document.getElementById(id);
+        const $$ = (sel) => document.querySelectorAll(sel);
+
+        const appContent = $("appContent");
+        const refreshIcon = $("refreshIcon");
+        const lastUpdate = $("lastUpdate");
+        const pullIndicator = $("pullIndicator");
+        const scrollTopBtn = $("scrollTopBtn");
+        const dynamicContent = $("dynamicContent");
+        const searchInput = $("searchInput");
+        const clearSearch = $("clearSearch");
+        const statusDot = $("statusDot");
+        const statusText = $("statusText");
+
+        // Modal
+        const modalOverlay = $("modalOverlay");
+        const modalTitle = $("modalTitle");
+        const modalBody = $("modalBody");
+        const modalClose = $("modalClose");
+
+        // ============================================================
+        // ESTADO
+        // ============================================================
+        let carregando = false;
+        let abaAtual = "geral";
+        let termoBusca = "";
+        let filtroFinanceiro = "todas";
+        let dadosCache = {
+          osAtivas: [],
+          countOsAtivas: 0,
+          countAtrasadas: 0,
+          countEntreguesHoje: 0,
+          pecasHoje: 0,
+          receitas: 0,
+          despesas: 0,
+          contasVencidas: 0,
+          contasProximas: [],
+          contasPagas: [],
+          todasContas: [],
+          qtdFuncionarios: 0,
+          ferias: [],
+          feriasEmAndamento: [],
+          parcelasDividas: [],
+          todasOS: [],
+          funcionarios: [],
+          saldoAtual: 0,
+        };
+        let conectado = false;
+
+        // ============================================================
+        // TESTE DE CONEXÃO
+        // ============================================================
+        async function testarConexao() {
+          console.log("🔄 Testando conexão...");
+          try {
+            const { data, error } = await supabaseClient
+              .from("service_orders")
+              .select("id")
+              .limit(1);
+
+            if (error) {
+              console.error("❌ Erro na conexão:", error);
+              statusDot.className = "dot offline";
+              statusText.textContent = "Offline";
+              return false;
+            }
+            console.log("✅ Conexão OK!");
+            statusDot.className = "dot online";
+            statusText.textContent = "Online";
+            return true;
+          } catch (e) {
+            console.error("❌ Exceção na conexão:", e);
+            statusDot.className = "dot offline";
+            statusText.textContent = "Offline";
+            return false;
+          }
+        }
+
+        // ============================================================
+        // CARREGAMENTO DE DADOS
+        // ============================================================
+        async function carregarDados() {
+          console.log("🔄 Iniciando carregamento...");
+
+          if (carregando) {
+            console.log("⏳ Já está carregando, ignorando...");
+            return;
+          }
+          carregando = true;
+
+          refreshIcon.className = "ph ph-spinner spinning";
+
+          try {
+            const hoje = todayISO();
+            console.log("📅 Data:", hoje);
+
+            const dataFim7 = new Date();
+            dataFim7.setDate(dataFim7.getDate() + 7);
+            const dataFim7Str = dataFim7.toISOString().split("T")[0];
+
+            const dataFim15 = new Date();
+            dataFim7.setDate(dataFim7.getDate() + 15);
+            const dataFim15Str = dataFim7.toISOString().split("T")[0];
+
+            const dataFim30 = new Date();
+            dataFim30.setDate(dataFim30.getDate() + 30);
+            const dataFim30Str = dataFim30.toISOString().split("T")[0];
+
+            // ===== 1. OS Ativas =====
+            const {
+              data: osAtivas,
+              count: countOsAtivas,
+              error: errOs,
+            } = await supabaseClient
+              .from("service_orders")
+              .select(
+                "id, order_number, customer_id, total_quantity, status, expected_delivery, received_date, product_description, customers(company_name, trade_name)",
+                { count: "exact" },
+              )
+              .not("status", "in", '("entregue","cancelado")')
+              .order("expected_delivery", { ascending: true })
+              .limit(20);
+
+            if (errOs) console.error("  ❌ Erro OS:", errOs);
+            else console.log(`  ✅ ${countOsAtivas || 0} OS ativas`);
+
+            // ===== 2. Todas OS =====
+            const { data: todasOS, error: errTodasOS } = await supabaseClient
+              .from("service_orders")
+              .select(
+                "id, order_number, customer_id, total_quantity, status, expected_delivery, received_date, product_description, customers(company_name, trade_name)",
+              )
+              .not("status", "in", '("cancelado")')
+              .order("created_at", { ascending: false })
+              .limit(50);
+
+            if (errTodasOS) console.error("  ❌ Erro todas OS:", errTodasOS);
+
+            // ===== 3. Funcionários =====
+            const { data: funcionarios, error: errFuncs } = await supabaseClient
+              .from("employees")
+              .select("id, full_name, role, active, admission_date")
+              .eq("active", true)
+              .limit(50);
+
+            if (errFuncs) console.error("  ❌ Erro funcionários:", errFuncs);
+            else console.log(`  ✅ ${funcionarios?.length || 0} funcionários`);
+
+            // ===== 4. Lotes atrasados =====
+            const { count: countAtrasadas, error: errAtras } =
+              await supabaseClient
+                .from("service_orders")
+                .select("id", { count: "exact" })
+                .not("status", "in", '("entregue","cancelado")')
+                .lt("expected_delivery", hoje);
+
+            if (errAtras) console.error("  ❌ Erro atrasados:", errAtras);
+
+            // ===== 5. Entregas hoje =====
+            const { count: countEntreguesHoje, error: errEntr } =
+              await supabaseClient
+                .from("service_orders")
+                .select("id", { count: "exact" })
+                .eq("status", "entregue")
+                .gte("updated_at", hoje)
+                .lte("updated_at", hoje + "T23:59:59");
+
+            if (errEntr) console.error("  ❌ Erro entregas:", errEntr);
+
+            // ===== 6. Produção hoje =====
+            const { data: recordsHoje, error: errRec } = await supabaseClient
+              .from("sewing_records")
+              .select("pieces_sewn")
+              .gte("start_time", hoje)
+              .lte("start_time", hoje + "T23:59:59");
+
+            if (errRec) console.error("  ❌ Erro produção:", errRec);
+            const pecasHoje = recordsHoje
+              ? recordsHoje.reduce((s, r) => s + r.pieces_sewn, 0)
+              : 0;
+
+            // ===== 7. FINANCEIRO COMPLETO =====
+            const primeiroDiaMes = new Date();
+            primeiroDiaMes.setDate(1);
+            const primeiroDiaStr = primeiroDiaMes.toISOString().split("T")[0];
+            const ultimoDiaMes = new Date(
+              new Date().getFullYear(),
+              new Date().getMonth() + 1,
+              0,
+            );
+            const ultimoDiaStr = ultimoDiaMes.toISOString().split("T")[0];
+
+            // Todas as transações do mês
+            const { data: todasContas, error: errTodasContas } =
+              await supabaseClient
+                .from("financial_transactions")
+                .select(
+                  "id, description, amount, date, due_date, type, status, payment_method, payment_date, category_id, notes, chart_of_accounts(name, type)",
+                )
+                .gte("date", primeiroDiaStr)
+                .lte("date", ultimoDiaStr)
+                .order("date", { ascending: false })
+                .limit(100);
+
+            if (errTodasContas)
+              console.error("  ❌ Erro todas contas:", errTodasContas);
+            else
+              console.log(`  ✅ ${todasContas?.length || 0} transações no mês`);
+
+            // Contas vencidas (pendentes com due_date < hoje)
+            const { data: contasVencidasData, error: errCV } =
+              await supabaseClient
+                .from("financial_transactions")
+                .select(
+                  "id, description, amount, due_date, type, status, payment_method, chart_of_accounts(name)",
+                )
+                .eq("status", "pendente")
+                .lt("due_date", hoje)
+                .order("due_date", { ascending: true });
+
+            if (errCV) console.error("  ❌ Erro contas vencidas:", errCV);
+            else
+              console.log(
+                `  ✅ ${contasVencidasData?.length || 0} contas vencidas`,
+              );
+
+            // Contas pagas no mês
+            const { data: contasPagasData, error: errCP } = await supabaseClient
+              .from("financial_transactions")
+              .select(
+                "id, description, amount, due_date, type, status, payment_date, chart_of_accounts(name)",
+              )
+              .eq("status", "pago")
+              .gte("payment_date", primeiroDiaStr)
+              .lte("payment_date", ultimoDiaStr)
+              .order("payment_date", { ascending: false });
+
+            if (errCP) console.error("  ❌ Erro contas pagas:", errCP);
+            else
+              console.log(
+                `  ✅ ${contasPagasData?.length || 0} contas pagas no mês`,
+              );
+
+            // Contas a vencer (próximos 7 dias)
+            const { data: contasProximasData, error: errProx } =
+              await supabaseClient
+                .from("financial_transactions")
+                .select(
+                  "id, description, amount, due_date, type, status, chart_of_accounts(name)",
+                )
+                .eq("status", "pendente")
+                .gte("due_date", hoje)
+                .lte("due_date", dataFim7Str)
+                .order("due_date", { ascending: true });
+
+            if (errProx) console.error("  ❌ Erro contas próximas:", errProx);
+            else
+              console.log(
+                `  ✅ ${contasProximasData?.length || 0} contas próximas`,
+              );
+
+            // Contas a vencer (15 dias)
+            const { data: contas15DiasData, error: err15 } =
+              await supabaseClient
+                .from("financial_transactions")
+                .select(
+                  "id, description, amount, due_date, type, status, chart_of_accounts(name)",
+                )
+                .eq("status", "pendente")
+                .gte("due_date", hoje)
+                .lte("due_date", dataFim15Str)
+                .order("due_date", { ascending: true });
+
+            // Calcular receitas e despesas do mês
+            let receitas = 0,
+              despesas = 0;
+            if (todasContas) {
+              todasContas.forEach((t) => {
+                const v = parseFloat(t.amount);
+                if (v > 0) receitas += v;
+                else despesas += Math.abs(v);
+              });
+            }
+
+            // ===== 8. Funcionários ativos (count) =====
+            const { count: qtdFuncionarios, error: errFunc } =
+              await supabaseClient
+                .from("employees")
+                .select("id", { count: "exact" })
+                .eq("active", true);
+
+            if (errFunc) console.error("  ❌ Erro funcionários:", errFunc);
+
+            // ===== 9. Férias =====
+            const { data: ferias, error: errFer } = await supabaseClient
+              .from("employee_vacations")
+              .select(
+                "id, employee_id, start_date, end_date, status, notes, employees(full_name)",
+              )
+              .neq("status", "cancelada")
+              .order("start_date", { ascending: true })
+              .limit(20);
+
+            if (errFer) console.error("  ❌ Erro férias:", errFer);
+
+            const feriasEmAndamento = ferias
+              ? ferias.filter((f) => {
+                  const hojeDate = new Date();
+                  const inicio = new Date(f.start_date);
+                  const fim = new Date(f.end_date);
+                  return (
+                    f.status === "agendada" &&
+                    inicio <= hojeDate &&
+                    fim >= hojeDate
+                  );
+                })
+              : [];
+
+            // ===== 10. Parcelas de dívidas =====
+            const { data: parcelasDividas, error: errDiv } =
+              await supabaseClient
+                .from("debt_installments")
+                .select(
+                  "id, amount, due_date, installment_number, debts(id, creditor, type)",
+                )
+                .eq("paid", false)
+                .gte("due_date", hoje)
+                .lte("due_date", dataFim30Str)
+                .order("due_date", { ascending: true })
+                .limit(20);
+
+            if (errDiv) console.error("  ❌ Erro dívidas:", errDiv);
 
             // ============================================================
-            // SUPABASE
+            // ARMAZENA CACHE
             // ============================================================
-            const SUPABASE_URL = 'https://evlatdyxcgklunwvnhcv.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_tn2G-m8F7M3Ey8C0LDJLNg_9MzszdAS';
-
-            let supabaseClient;
-
-            try {
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Cliente Supabase criado');
-            } catch (e) {
-                console.error('❌ Erro ao criar cliente Supabase:', e);
-                if (typeof supabaseJs !== 'undefined') {
-                    supabaseClient = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                    console.log('✅ Cliente Supabase criado via supabaseJs');
-                } else {
-                    throw new Error('Não foi possível criar o cliente Supabase');
-                }
-            }
-
-            // ============================================================
-            // AUXILIARES
-            // ============================================================
-            function todayISO() {
-                return new Date().toISOString().split('T')[0];
-            }
-
-            function formatDate(iso) {
-                if (!iso) return '-';
-                try {
-                    const d = new Date(iso + 'T00:00:00');
-                    return d.toLocaleDateString('pt-BR');
-                } catch { return iso; }
-            }
-
-            function formatDateTime(iso) {
-                if (!iso) return '-';
-                try {
-                    const d = new Date(iso);
-                    return d.toLocaleString('pt-BR');
-                } catch { return iso; }
-            }
-
-            function formatCurrency(v) {
-                if (v === null || v === undefined) v = 0;
-                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
-            }
-
-            function formatStatus(s) {
-                const map = {
-                    recebido: 'Recebido',
-                    em_costura: 'Em Costura',
-                    costurado: 'Costurado',
-                    em_revisao: 'Em Revisão',
-                    entregue: 'Entregue',
-                    cancelado: 'Cancelado',
-                    parcialmente_entregue: 'Parcial'
-                };
-                return map[s] || s || '-';
-            }
-
-            function getStatusClass(s) {
-                return 'badge-status-' + s;
-            }
-
-            function formatTime() {
-                return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            }
-
-            function formatDateTimeFull() {
-                return new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            }
-
-            function capitalizeFirst(str) {
-                if (!str) return '';
-                return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-            }
-
-            function escapeHtml(str) {
-                if (!str) return '';
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
-
-            // ============================================================
-            // ELEMENTOS DOM
-            // ============================================================
-            const $ = (id) => document.getElementById(id);
-            const $$ = (sel) => document.querySelectorAll(sel);
-
-            const appContent = $('appContent');
-            const refreshIcon = $('refreshIcon');
-            const lastUpdate = $('lastUpdate');
-            const pullIndicator = $('pullIndicator');
-            const scrollTopBtn = $('scrollTopBtn');
-            const dynamicContent = $('dynamicContent');
-            const searchInput = $('searchInput');
-            const clearSearch = $('clearSearch');
-            const statusDot = $('statusDot');
-            const statusText = $('statusText');
-
-            // Modal
-            const modalOverlay = $('modalOverlay');
-            const modalTitle = $('modalTitle');
-            const modalBody = $('modalBody');
-            const modalClose = $('modalClose');
-
-            // ============================================================
-            // ESTADO
-            // ============================================================
-            let carregando = false;
-            let abaAtual = 'geral';
-            let termoBusca = '';
-            let filtroFinanceiro = 'todas';
-            let dadosCache = {
-                osAtivas: [],
-                countOsAtivas: 0,
-                countAtrasadas: 0,
-                countEntreguesHoje: 0,
-                pecasHoje: 0,
-                receitas: 0,
-                despesas: 0,
-                contasVencidas: 0,
-                contasProximas: [],
-                contasPagas: [],
-                todasContas: [],
-                qtdFuncionarios: 0,
-                ferias: [],
-                feriasEmAndamento: [],
-                parcelasDividas: [],
-                todasOS: [],
-                funcionarios: [],
-                saldoAtual: 0
+            dadosCache = {
+              osAtivas: osAtivas || [],
+              countOsAtivas: countOsAtivas || 0,
+              countAtrasadas: countAtrasadas || 0,
+              countEntreguesHoje: countEntreguesHoje || 0,
+              pecasHoje: pecasHoje || 0,
+              receitas: receitas || 0,
+              despesas: despesas || 0,
+              contasVencidas: contasVencidasData?.length || 0,
+              contasVencidasData: contasVencidasData || [],
+              contasProximas: contasProximasData || [],
+              contasPagas: contasPagasData || [],
+              contas15Dias: contas15DiasData || [],
+              todasContas: todasContas || [],
+              qtdFuncionarios: qtdFuncionarios || 0,
+              ferias: ferias || [],
+              feriasEmAndamento: feriasEmAndamento || [],
+              parcelasDividas: parcelasDividas || [],
+              todasOS: todasOS || [],
+              funcionarios: funcionarios || [],
+              saldoAtual: receitas - despesas,
             };
-            let conectado = false;
 
             // ============================================================
-            // TESTE DE CONEXÃO
+            // RENDERIZA
             // ============================================================
-            async function testarConexao() {
-                console.log('🔄 Testando conexão...');
-                try {
-                    const { data, error } = await supabaseClient
-                        .from('service_orders')
-                        .select('id')
-                        .limit(1);
-
-                    if (error) {
-                        console.error('❌ Erro na conexão:', error);
-                        statusDot.className = 'dot offline';
-                        statusText.textContent = 'Offline';
-                        return false;
-                    }
-                    console.log('✅ Conexão OK!');
-                    statusDot.className = 'dot online';
-                    statusText.textContent = 'Online';
-                    return true;
-                } catch (e) {
-                    console.error('❌ Exceção na conexão:', e);
-                    statusDot.className = 'dot offline';
-                    statusText.textContent = 'Offline';
-                    return false;
-                }
-            }
-
-            // ============================================================
-            // CARREGAMENTO DE DADOS
-            // ============================================================
-            async function carregarDados() {
-                console.log('🔄 Iniciando carregamento...');
-
-                if (carregando) {
-                    console.log('⏳ Já está carregando, ignorando...');
-                    return;
-                }
-                carregando = true;
-
-                refreshIcon.className = 'ph ph-spinner spinning';
-
-                try {
-                    const hoje = todayISO();
-                    console.log('📅 Data:', hoje);
-
-                    const dataFim7 = new Date();
-                    dataFim7.setDate(dataFim7.getDate() + 7);
-                    const dataFim7Str = dataFim7.toISOString().split('T')[0];
-
-                    const dataFim30 = new Date();
-                    dataFim30.setDate(dataFim30.getDate() + 30);
-                    const dataFim30Str = dataFim30.toISOString().split('T')[0];
-
-                    // ===== 1. OS Ativas =====
-                    const { data: osAtivas, count: countOsAtivas, error: errOs } = await supabaseClient
-                        .from('service_orders')
-                        .select('id, order_number, customer_id, total_quantity, status, expected_delivery, received_date, product_description, customers(company_name, trade_name)', { count: 'exact' })
-                        .not('status', 'in', '("entregue","cancelado")')
-                        .order('expected_delivery', { ascending: true })
-                        .limit(20);
-
-                    if (errOs) console.error('  ❌ Erro OS:', errOs);
-                    else console.log(`  ✅ ${countOsAtivas || 0} OS ativas`);
-
-                    // ===== 2. Todas OS =====
-                    const { data: todasOS, error: errTodasOS } = await supabaseClient
-                        .from('service_orders')
-                        .select('id, order_number, customer_id, total_quantity, status, expected_delivery, received_date, product_description, customers(company_name, trade_name)')
-                        .not('status', 'in', '("cancelado")')
-                        .order('created_at', { ascending: false })
-                        .limit(50);
-
-                    if (errTodasOS) console.error('  ❌ Erro todas OS:', errTodasOS);
-
-                    // ===== 3. Funcionários =====
-                    const { data: funcionarios, error: errFuncs } = await supabaseClient
-                        .from('employees')
-                        .select('id, full_name, role, active, admission_date')
-                        .eq('active', true)
-                        .limit(50);
-
-                    if (errFuncs) console.error('  ❌ Erro funcionários:', errFuncs);
-                    else console.log(`  ✅ ${funcionarios?.length || 0} funcionários`);
-
-                    // ===== 4. Lotes atrasados =====
-                    const { count: countAtrasadas, error: errAtras } = await supabaseClient
-                        .from('service_orders')
-                        .select('id', { count: 'exact' })
-                        .not('status', 'in', '("entregue","cancelado")')
-                        .lt('expected_delivery', hoje);
-
-                    if (errAtras) console.error('  ❌ Erro atrasados:', errAtras);
-
-                    // ===== 5. Entregas hoje =====
-                    const { count: countEntreguesHoje, error: errEntr } = await supabaseClient
-                        .from('service_orders')
-                        .select('id', { count: 'exact' })
-                        .eq('status', 'entregue')
-                        .gte('updated_at', hoje)
-                        .lte('updated_at', hoje + 'T23:59:59');
-
-                    if (errEntr) console.error('  ❌ Erro entregas:', errEntr);
-
-                    // ===== 6. Produção hoje =====
-                    const { data: recordsHoje, error: errRec } = await supabaseClient
-                        .from('sewing_records')
-                        .select('pieces_sewn')
-                        .gte('start_time', hoje)
-                        .lte('start_time', hoje + 'T23:59:59');
-
-                    if (errRec) console.error('  ❌ Erro produção:', errRec);
-                    const pecasHoje = recordsHoje ? recordsHoje.reduce((s, r) => s + r.pieces_sewn, 0) : 0;
-
-                    // ===== 7. FINANCEIRO COMPLETO =====
-                    const primeiroDiaMes = new Date();
-                    primeiroDiaMes.setDate(1);
-                    const primeiroDiaStr = primeiroDiaMes.toISOString().split('T')[0];
-                    const ultimoDiaMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
-                    const ultimoDiaStr = ultimoDiaMes.toISOString().split('T')[0];
-
-                    // Todas as transações do mês
-                    const { data: todasContas, error: errTodasContas } = await supabaseClient
-                        .from('financial_transactions')
-                        .select('id, description, amount, date, due_date, type, status, payment_method, payment_date, category_id, notes, chart_of_accounts(name, type)')
-                        .gte('date', primeiroDiaStr)
-                        .lte('date', ultimoDiaStr)
-                        .order('date', { ascending: false })
-                        .limit(100);
-
-                    if (errTodasContas) console.error('  ❌ Erro todas contas:', errTodasContas);
-                    else console.log(`  ✅ ${todasContas?.length || 0} transações no mês`);
-
-                    // Contas vencidas (pendentes com due_date < hoje)
-                    const { data: contasVencidasData, error: errCV } = await supabaseClient
-                        .from('financial_transactions')
-                        .select('id, description, amount, due_date, type, status, payment_method, chart_of_accounts(name)')
-                        .eq('status', 'pendente')
-                        .lt('due_date', hoje)
-                        .order('due_date', { ascending: true });
-
-                    if (errCV) console.error('  ❌ Erro contas vencidas:', errCV);
-                    else console.log(`  ✅ ${contasVencidasData?.length || 0} contas vencidas`);
-
-                    // Contas pagas no mês
-                    const { data: contasPagasData, error: errCP } = await supabaseClient
-                        .from('financial_transactions')
-                        .select('id, description, amount, due_date, type, status, payment_date, chart_of_accounts(name)')
-                        .eq('status', 'pago')
-                        .gte('payment_date', primeiroDiaStr)
-                        .lte('payment_date', ultimoDiaStr)
-                        .order('payment_date', { ascending: false });
-
-                    if (errCP) console.error('  ❌ Erro contas pagas:', errCP);
-                    else console.log(`  ✅ ${contasPagasData?.length || 0} contas pagas no mês`);
-
-                    // Contas a vencer (próximos 7 dias)
-                    const { data: contasProximasData, error: errProx } = await supabaseClient
-                        .from('financial_transactions')
-                        .select('id, description, amount, due_date, type, status, chart_of_accounts(name)')
-                        .eq('status', 'pendente')
-                        .gte('due_date', hoje)
-                        .lte('due_date', dataFim7Str)
-                        .order('due_date', { ascending: true });
-
-                    if (errProx) console.error('  ❌ Erro contas próximas:', errProx);
-                    else console.log(`  ✅ ${contasProximasData?.length || 0} contas próximas`);
-
-                    // Contas a vencer (15 dias)
-                    const { data: contas15DiasData, error: err15 } = await supabaseClient
-                        .from('financial_transactions')
-                        .select('id, description, amount, due_date, type, status, chart_of_accounts(name)')
-                        .eq('status', 'pendente')
-                        .gte('due_date', hoje)
-                        .lte('due_date', dataFim15Str)
-                        .order('due_date', { ascending: true });
-
-                    // Calcular receitas e despesas do mês
-                    let receitas = 0,
-                        despesas = 0;
-                    if (todasContas) {
-                        todasContas.forEach(t => {
-                            const v = parseFloat(t.amount);
-                            if (v > 0) receitas += v;
-                            else despesas += Math.abs(v);
-                        });
-                    }
-
-                    // ===== 8. Funcionários ativos (count) =====
-                    const { count: qtdFuncionarios, error: errFunc } = await supabaseClient
-                        .from('employees')
-                        .select('id', { count: 'exact' })
-                        .eq('active', true);
-
-                    if (errFunc) console.error('  ❌ Erro funcionários:', errFunc);
-
-                    // ===== 9. Férias =====
-                    const { data: ferias, error: errFer } = await supabaseClient
-                        .from('employee_vacations')
-                        .select('id, employee_id, start_date, end_date, status, notes, employees(full_name)')
-                        .neq('status', 'cancelada')
-                        .order('start_date', { ascending: true })
-                        .limit(20);
-
-                    if (errFer) console.error('  ❌ Erro férias:', errFer);
-
-                    const feriasEmAndamento = ferias ? ferias.filter(f => {
-                        const hojeDate = new Date();
-                        const inicio = new Date(f.start_date);
-                        const fim = new Date(f.end_date);
-                        return f.status === 'agendada' && inicio <= hojeDate && fim >= hojeDate;
-                    }) : [];
-
-                    // ===== 10. Parcelas de dívidas =====
-                    const { data: parcelasDividas, error: errDiv } = await supabaseClient
-                        .from('debt_installments')
-                        .select('id, amount, due_date, installment_number, debts(id, creditor, type)')
-                        .eq('paid', false)
-                        .gte('due_date', hoje)
-                        .lte('due_date', dataFim30Str)
-                        .order('due_date', { ascending: true })
-                        .limit(20);
-
-                    if (errDiv) console.error('  ❌ Erro dívidas:', errDiv);
-
-                    // ============================================================
-                    // ARMAZENA CACHE
-                    // ============================================================
-                    dadosCache = {
-                        osAtivas: osAtivas || [],
-                        countOsAtivas: countOsAtivas || 0,
-                        countAtrasadas: countAtrasadas || 0,
-                        countEntreguesHoje: countEntreguesHoje || 0,
-                        pecasHoje: pecasHoje || 0,
-                        receitas: receitas || 0,
-                        despesas: despesas || 0,
-                        contasVencidas: contasVencidasData?.length || 0,
-                        contasVencidasData: contasVencidasData || [],
-                        contasProximas: contasProximasData || [],
-                        contasPagas: contasPagasData || [],
-                        contas15Dias: contas15DiasData || [],
-                        todasContas: todasContas || [],
-                        qtdFuncionarios: qtdFuncionarios || 0,
-                        ferias: ferias || [],
-                        feriasEmAndamento: feriasEmAndamento || [],
-                        parcelasDividas: parcelasDividas || [],
-                        todasOS: todasOS || [],
-                        funcionarios: funcionarios || [],
-                        saldoAtual: receitas - despesas
-                    };
-
-                    // ============================================================
-                    // RENDERIZA
-                    // ============================================================
-                    renderizarConteudo();
-
-                } catch (e) {
-                    console.error('❌ Erro geral:', e);
-                    dynamicContent.innerHTML = `
+            renderizarConteudo();
+          } catch (e) {
+            console.error("❌ Erro geral:", e);
+            dynamicContent.innerHTML = `
                         <div class="alert-item alert-high" style="margin-top:16px;">
                             <i class="ph ph-warning-circle" style="color:var(--error);"></i>
-                            <span class="alert-text"><strong>Erro ao carregar dados.</strong> ${e.message || 'Verifique sua conexão.'}</span>
+                            <span class="alert-text"><strong>Erro ao carregar dados.</strong> ${e.message || "Verifique sua conexão."}</span>
                             <button onclick="window.carregarDados()" style="background:var(--gold);border:none;border-radius:20px;padding:4px 12px;font-weight:600;cursor:pointer;color:#000;">Tentar</button>
                         </div>
                     `;
-                } finally {
-                    carregando = false;
-                    refreshIcon.className = 'ph ph-arrows-clockwise';
-                    pullIndicator.classList.remove('active');
-                    lastUpdate.textContent = formatTime();
-                }
-            }
+          } finally {
+            carregando = false;
+            refreshIcon.className = "ph ph-arrows-clockwise";
+            pullIndicator.classList.remove("active");
+            lastUpdate.textContent = formatTime();
+          }
+        }
 
-            // ============================================================
-            // RENDERIZAÇÃO DO CONTEÚDO
-            // ============================================================
-            function renderizarConteudo() {
-                const aba = abaAtual;
-                const busca = termoBusca.toLowerCase().trim();
-                let html = '';
+        // ============================================================
+        // RENDERIZAÇÃO DO CONTEÚDO
+        // ============================================================
+        function renderizarConteudo() {
+          const aba = abaAtual;
+          const busca = termoBusca.toLowerCase().trim();
+          let html = "";
 
-                // Filtra dados com base na busca
-                const filtrarOS = (lista) => {
-                    if (!busca) return lista;
-                    return lista.filter(os => {
-                        const cliente = (os.customers?.trade_name || os.customers?.company_name || '').toLowerCase();
-                        const numero = (os.order_number || '').toLowerCase();
-                        const produto = (os.product_description || '').toLowerCase();
-                        return cliente.includes(busca) || numero.includes(busca) || produto.includes(busca);
-                    });
-                };
+          // Filtra dados com base na busca
+          const filtrarOS = (lista) => {
+            if (!busca) return lista;
+            return lista.filter((os) => {
+              const cliente = (
+                os.customers?.trade_name ||
+                os.customers?.company_name ||
+                ""
+              ).toLowerCase();
+              const numero = (os.order_number || "").toLowerCase();
+              const produto = (os.product_description || "").toLowerCase();
+              return (
+                cliente.includes(busca) ||
+                numero.includes(busca) ||
+                produto.includes(busca)
+              );
+            });
+          };
 
-                const filtrarFerias = (lista) => {
-                    if (!busca) return lista;
-                    return lista.filter(f => {
-                        const nome = (f.employees?.full_name || '').toLowerCase();
-                        return nome.includes(busca);
-                    });
-                };
+          const filtrarFerias = (lista) => {
+            if (!busca) return lista;
+            return lista.filter((f) => {
+              const nome = (f.employees?.full_name || "").toLowerCase();
+              return nome.includes(busca);
+            });
+          };
 
-                const filtrarContas = (lista) => {
-                    if (!busca) return lista;
-                    return lista.filter(c => {
-                        const desc = (c.description || '').toLowerCase();
-                        const cat = (c.chart_of_accounts?.name || '').toLowerCase();
-                        return desc.includes(busca) || cat.includes(busca);
-                    });
-                };
+          const filtrarContas = (lista) => {
+            if (!busca) return lista;
+            return lista.filter((c) => {
+              const desc = (c.description || "").toLowerCase();
+              const cat = (c.chart_of_accounts?.name || "").toLowerCase();
+              return desc.includes(busca) || cat.includes(busca);
+            });
+          };
 
-                const filtrarDividas = (lista) => {
-                    if (!busca) return lista;
-                    return lista.filter(p => {
-                        const credor = (p.debts?.creditor || '').toLowerCase();
-                        return credor.includes(busca);
-                    });
-                };
+          const filtrarDividas = (lista) => {
+            if (!busca) return lista;
+            return lista.filter((p) => {
+              const credor = (p.debts?.creditor || "").toLowerCase();
+              return credor.includes(busca);
+            });
+          };
 
-                const filtrarFuncionarios = (lista) => {
-                    if (!busca) return lista;
-                    return lista.filter(f => {
-                        const nome = (f.full_name || '').toLowerCase();
-                        const funcao = (f.role || '').toLowerCase();
-                        return nome.includes(busca) || funcao.includes(busca);
-                    });
-                };
+          const filtrarFuncionarios = (lista) => {
+            if (!busca) return lista;
+            return lista.filter((f) => {
+              const nome = (f.full_name || "").toLowerCase();
+              const funcao = (f.role || "").toLowerCase();
+              return nome.includes(busca) || funcao.includes(busca);
+            });
+          };
 
-                switch (aba) {
-                    case 'geral':
-                        html = renderizarGeral();
-                        break;
-                    case 'producao':
-                        html = renderizarProducao(filtrarOS(dadosCache.osAtivas));
-                        break;
-                    case 'financeiro':
-                        html = renderizarFinanceiroCompleto();
-                        break;
-                    case 'rh':
-                        html = renderizarRH(filtrarFerias(dadosCache.ferias), filtrarFuncionarios(dadosCache.funcionarios));
-                        break;
-                    case 'dividas':
-                        html = renderizarDividas(filtrarDividas(dadosCache.parcelasDividas));
-                        break;
-                }
+          switch (aba) {
+            case "geral":
+              html = renderizarGeral();
+              break;
+            case "producao":
+              html = renderizarProducao(filtrarOS(dadosCache.osAtivas));
+              break;
+            case "financeiro":
+              html = renderizarFinanceiroCompleto();
+              break;
+            case "rh":
+              html = renderizarRH(
+                filtrarFerias(dadosCache.ferias),
+                filtrarFuncionarios(dadosCache.funcionarios),
+              );
+              break;
+            case "dividas":
+              html = renderizarDividas(
+                filtrarDividas(dadosCache.parcelasDividas),
+              );
+              break;
+          }
 
-                dynamicContent.innerHTML = html;
+          dynamicContent.innerHTML = html;
 
-                // Atualiza badges da tab bar
-                atualizarBadges();
-            }
+          // Atualiza badges da tab bar
+          atualizarBadges();
+        }
 
-            // ============================================================
-            // RENDERIZAÇÃO: GERAL
-            // ============================================================
-            function renderizarGeral() {
-                const d = dadosCache;
-                const saldo = d.receitas - d.despesas;
+        // ============================================================
+        // RENDERIZAÇÃO: GERAL
+        // ============================================================
+        function renderizarGeral() {
+          const d = dadosCache;
+          const saldo = d.receitas - d.despesas;
 
-                return `
+          return `
                     <!-- KPIs -->
                     <div class="kpi-grid">
                         <div class="kpi-card" onclick="window.irAba('producao')">
@@ -1557,7 +1692,7 @@
                             <div class="kpi-value">${d.feriasEmAndamento.length}</div>
                             <div class="kpi-detail">funcionários</div>
                         </div>
-                        <div class="kpi-card ${saldo >= 0 ? 'kpi-success' : 'kpi-danger'}" onclick="window.irAba('financeiro')">
+                        <div class="kpi-card ${saldo >= 0 ? "kpi-success" : "kpi-danger"}" onclick="window.irAba('financeiro')">
                             <div class="kpi-label"><i class="ph ph-currency-circle-dollar"></i> Saldo Mês</div>
                             <div class="kpi-value">${formatCurrency(saldo)}</div>
                             <div class="kpi-detail">receitas - despesas</div>
@@ -1607,7 +1742,7 @@
                                     <div class="item-sub">${d.contasProximas.length} contas nos próximos 7 dias</div>
                                 </div>
                                 <div class="item-right">
-                                    <span class="item-value ${d.contasProximas.length > 0 ? 'item-error' : 'item-success'}">${d.contasProximas.length}</span>
+                                    <span class="item-value ${d.contasProximas.length > 0 ? "item-error" : "item-success"}">${d.contasProximas.length}</span>
                                     <div><i class="ph ph-caret-right item-arrow"></i></div>
                                 </div>
                             </div>
@@ -1634,24 +1769,24 @@
                         </div>
                     </div>
                 `;
-            }
+        }
 
-            // ============================================================
-            // RENDERIZAÇÃO: PRODUÇÃO
-            // ============================================================
-            function renderizarProducao(osLista) {
-                const d = dadosCache;
+        // ============================================================
+        // RENDERIZAÇÃO: PRODUÇÃO
+        // ============================================================
+        function renderizarProducao(osLista) {
+          const d = dadosCache;
 
-                if (osLista.length === 0) {
-                    return `
+          if (osLista.length === 0) {
+            return `
                         <div class="empty-state">
                             <i class="ph ph-sewing-needle"></i>
-                            <p>${termoBusca ? 'Nenhuma OS encontrada para "' + termoBusca + '"' : 'Nenhuma OS em produção'}</p>
+                            <p>${termoBusca ? 'Nenhuma OS encontrada para "' + termoBusca + '"' : "Nenhuma OS em produção"}</p>
                         </div>
                     `;
-                }
+          }
 
-                let html = `
+          let html = `
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                         <span style="font-size:12px;color:var(--gray);">${osLista.length} OS em produção</span>
                         <span style="font-size:11px;color:var(--gray-dark);">${d.countAtrasadas} atrasadas</span>
@@ -1659,197 +1794,223 @@
                     <div class="list-wrapper">
                 `;
 
-                osLista.forEach(os => {
-                    const cliente = os.customers?.trade_name || os.customers?.company_name || '-';
-                    const atrasado = new Date(os.expected_delivery) < new Date();
-                    const hoje = new Date();
-                    const diffDias = Math.ceil((new Date(os.expected_delivery) - hoje) / (1000 * 60 * 60 * 24));
+          osLista.forEach((os) => {
+            const cliente =
+              os.customers?.trade_name || os.customers?.company_name || "-";
+            const atrasado = new Date(os.expected_delivery) < new Date();
+            const hoje = new Date();
+            const diffDias = Math.ceil(
+              (new Date(os.expected_delivery) - hoje) / (1000 * 60 * 60 * 24),
+            );
 
-                    html += `
-                        <div class="list-item ${atrasado ? 'item-danger' : ''}" onclick="window.verDetalhesOS('${os.id}')">
+            html += `
+                        <div class="list-item ${atrasado ? "item-danger" : ""}" onclick="window.verDetalhesOS('${os.id}')">
                             <div class="item-main">
                                 <div class="item-title">${os.order_number}</div>
                                 <div class="item-sub">${cliente} · ${os.total_quantity} peças</div>
                             </div>
                             <div class="item-right">
                                 <span class="item-badge ${getStatusClass(os.status)}">${formatStatus(os.status)}</span>
-                                <div style="font-size:9px;color:${atrasado ? 'var(--error)' : 'var(--gray-dark)'};margin-top:2px;">
+                                <div style="font-size:9px;color:${atrasado ? "var(--error)" : "var(--gray-dark)"};margin-top:2px;">
                                     ${formatDate(os.expected_delivery)}
-                                    ${atrasado ? ` ⚠️ ${Math.abs(diffDias)} dias` : diffDias > 0 ? ` (${diffDias} dias)` : ''}
+                                    ${atrasado ? ` ⚠️ ${Math.abs(diffDias)} dias` : diffDias > 0 ? ` (${diffDias} dias)` : ""}
                                 </div>
                             </div>
                         </div>
                     `;
-                });
+          });
 
-                html += `</div>`;
-                return html;
-            }
+          html += `</div>`;
+          return html;
+        }
 
-            // ============================================================
-            // RENDERIZAÇÃO: FINANCEIRO COMPLETO
-            // ============================================================
-            function renderizarFinanceiroCompleto() {
-                const d = dadosCache;
-                const saldo = d.receitas - d.despesas;
+        // ============================================================
+        // RENDERIZAÇÃO: FINANCEIRO COMPLETO
+        // ============================================================
+        function renderizarFinanceiroCompleto() {
+          const d = dadosCache;
+          const saldo = d.receitas - d.despesas;
 
-                // Se não houver dados, mostra mensagem
-                if (d.todasContas.length === 0 && d.contasVencidas === 0 && d.contasProximas.length === 0) {
-                    return `
+          // Se não houver dados, mostra mensagem
+          if (
+            d.todasContas.length === 0 &&
+            d.contasVencidas === 0 &&
+            d.contasProximas.length === 0
+          ) {
+            return `
                         <div class="empty-state">
                             <i class="ph ph-currency-circle-dollar"></i>
                             <p>Nenhuma transação financeira encontrada neste mês.</p>
                         </div>
                     `;
-                }
+          }
 
-                let html = '';
+          let html = "";
 
-                // ===== RESUMO FINANCEIRO =====
-                html += `
+          // ===== RESUMO FINANCEIRO =====
+          html += `
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
                         <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(76,175,80,0.15);">
                             <div style="font-size:8px;color:var(--gray);text-transform:uppercase;">Receitas</div>
                             <div style="font-size:16px;font-weight:700;color:var(--success);">${formatCurrency(d.receitas)}</div>
-                            <div style="font-size:8px;color:var(--gray-dark);">${d.todasContas.filter(c => parseFloat(c.amount) > 0).length} lançamentos</div>
+                            <div style="font-size:8px;color:var(--gray-dark);">${d.todasContas.filter((c) => parseFloat(c.amount) > 0).length} lançamentos</div>
                         </div>
                         <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,82,82,0.15);">
                             <div style="font-size:8px;color:var(--gray);text-transform:uppercase;">Despesas</div>
                             <div style="font-size:16px;font-weight:700;color:var(--error);">${formatCurrency(d.despesas)}</div>
-                            <div style="font-size:8px;color:var(--gray-dark);">${d.todasContas.filter(c => parseFloat(c.amount) < 0).length} lançamentos</div>
+                            <div style="font-size:8px;color:var(--gray-dark);">${d.todasContas.filter((c) => parseFloat(c.amount) < 0).length} lançamentos</div>
                         </div>
-                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;border:1px solid ${saldo >= 0 ? 'rgba(76,175,80,0.2)' : 'rgba(255,82,82,0.2)'};">
+                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;border:1px solid ${saldo >= 0 ? "rgba(76,175,80,0.2)" : "rgba(255,82,82,0.2)"};">
                             <div style="font-size:8px;color:var(--gray);text-transform:uppercase;">Saldo</div>
-                            <div style="font-size:16px;font-weight:700;color:${saldo >= 0 ? 'var(--success)' : 'var(--error)'};">${formatCurrency(saldo)}</div>
-                            <div style="font-size:8px;color:var(--gray-dark);">${saldo >= 0 ? '📈 Lucro' : '📉 Prejuízo'}</div>
+                            <div style="font-size:16px;font-weight:700;color:${saldo >= 0 ? "var(--success)" : "var(--error)"};">${formatCurrency(saldo)}</div>
+                            <div style="font-size:8px;color:var(--gray-dark);">${saldo >= 0 ? "📈 Lucro" : "📉 Prejuízo"}</div>
                         </div>
                     </div>
                 `;
 
-                // ===== FILTROS RÁPIDOS =====
-                html += `
+          // ===== FILTROS RÁPIDOS =====
+          html += `
                     <div class="filter-tabs" id="filtrosFinanceiro">
-                        <button class="filter-tab ${filtroFinanceiro === 'todas' ? 'active' : ''}" data-filtro="todas" onclick="window.setFiltroFinanceiro('todas')">Todas</button>
-                        <button class="filter-tab ${filtroFinanceiro === 'vencidas' ? 'active' : ''}" data-filtro="vencidas" onclick="window.setFiltroFinanceiro('vencidas')">Vencidas</button>
-                        <button class="filter-tab ${filtroFinanceiro === 'proximas' ? 'active' : ''}" data-filtro="proximas" onclick="window.setFiltroFinanceiro('proximas')">Próximas</button>
-                        <button class="filter-tab ${filtroFinanceiro === 'pagas' ? 'active' : ''}" data-filtro="pagas" onclick="window.setFiltroFinanceiro('pagas')">Pagas</button>
-                        <button class="filter-tab ${filtroFinanceiro === 'receber' ? 'active' : ''}" data-filtro="receber" onclick="window.setFiltroFinanceiro('receber')">A Receber</button>
-                        <button class="filter-tab ${filtroFinanceiro === 'pagar' ? 'active' : ''}" data-filtro="pagar" onclick="window.setFiltroFinanceiro('pagar')">A Pagar</button>
+                        <button class="filter-tab ${filtroFinanceiro === "todas" ? "active" : ""}" data-filtro="todas" onclick="window.setFiltroFinanceiro('todas')">Todas</button>
+                        <button class="filter-tab ${filtroFinanceiro === "vencidas" ? "active" : ""}" data-filtro="vencidas" onclick="window.setFiltroFinanceiro('vencidas')">Vencidas</button>
+                        <button class="filter-tab ${filtroFinanceiro === "proximas" ? "active" : ""}" data-filtro="proximas" onclick="window.setFiltroFinanceiro('proximas')">Próximas</button>
+                        <button class="filter-tab ${filtroFinanceiro === "pagas" ? "active" : ""}" data-filtro="pagas" onclick="window.setFiltroFinanceiro('pagas')">Pagas</button>
+                        <button class="filter-tab ${filtroFinanceiro === "receber" ? "active" : ""}" data-filtro="receber" onclick="window.setFiltroFinanceiro('receber')">A Receber</button>
+                        <button class="filter-tab ${filtroFinanceiro === "pagar" ? "active" : ""}" data-filtro="pagar" onclick="window.setFiltroFinanceiro('pagar')">A Pagar</button>
                     </div>
                 `;
 
-                // ===== DADOS FILTRADOS =====
-                let contasParaExibir = [];
-                let tituloSecao = 'Todas as Transações';
+          // ===== DADOS FILTRADOS =====
+          let contasParaExibir = [];
+          let tituloSecao = "Todas as Transações";
 
-                switch (filtroFinanceiro) {
-                    case 'vencidas':
-                        contasParaExibir = d.contasVencidasData || [];
-                        tituloSecao = '🔴 Contas Vencidas';
-                        break;
-                    case 'proximas':
-                        contasParaExibir = d.contasProximas || [];
-                        tituloSecao = '⏳ Contas a Vencer (7 dias)';
-                        break;
-                    case 'pagas':
-                        contasParaExibir = d.contasPagas || [];
-                        tituloSecao = '✅ Contas Pagas no Mês';
-                        break;
-                    case 'receber':
-                        contasParaExibir = d.todasContas.filter(c => c.type === 'receber' && c.status !== 'pago');
-                        tituloSecao = '📈 A Receber';
-                        break;
-                    case 'pagar':
-                        contasParaExibir = d.todasContas.filter(c => c.type === 'pagar' && c.status !== 'pago');
-                        tituloSecao = '📉 A Pagar';
-                        break;
-                    default:
-                        contasParaExibir = d.todasContas.slice(0, 30);
-                        tituloSecao = '📋 Todas as Transações do Mês';
-                        break;
-                }
+          switch (filtroFinanceiro) {
+            case "vencidas":
+              contasParaExibir = d.contasVencidasData || [];
+              tituloSecao = "🔴 Contas Vencidas";
+              break;
+            case "proximas":
+              contasParaExibir = d.contasProximas || [];
+              tituloSecao = "⏳ Contas a Vencer (7 dias)";
+              break;
+            case "pagas":
+              contasParaExibir = d.contasPagas || [];
+              tituloSecao = "✅ Contas Pagas no Mês";
+              break;
+            case "receber":
+              contasParaExibir = d.todasContas.filter(
+                (c) => c.type === "receber" && c.status !== "pago",
+              );
+              tituloSecao = "📈 A Receber";
+              break;
+            case "pagar":
+              contasParaExibir = d.todasContas.filter(
+                (c) => c.type === "pagar" && c.status !== "pago",
+              );
+              tituloSecao = "📉 A Pagar";
+              break;
+            default:
+              contasParaExibir = d.todasContas.slice(0, 30);
+              tituloSecao = "📋 Todas as Transações do Mês";
+              break;
+          }
 
-                // Aplica busca se houver
-                if (termoBusca) {
-                    contasParaExibir = contasParaExibir.filter(c => {
-                        const desc = (c.description || '').toLowerCase();
-                        const cat = (c.chart_of_accounts?.name || '').toLowerCase();
-                        return desc.includes(termoBusca) || cat.includes(termoBusca);
-                    });
-                }
+          // Aplica busca se houver
+          if (termoBusca) {
+            contasParaExibir = contasParaExibir.filter((c) => {
+              const desc = (c.description || "").toLowerCase();
+              const cat = (c.chart_of_accounts?.name || "").toLowerCase();
+              return desc.includes(termoBusca) || cat.includes(termoBusca);
+            });
+          }
 
-                // ===== TÍTULO DA SEÇÃO =====
-                html += `
+          // ===== TÍTULO DA SEÇÃO =====
+          html += `
                     <div class="section-header">
                         <div class="section-title"><i class="ph ph-list"></i> ${tituloSecao}</div>
                         <span class="section-badge">${contasParaExibir.length}</span>
                     </div>
                 `;
 
-                // ===== LISTA DE CONTAS =====
-                if (contasParaExibir.length === 0) {
-                    html += `
+          // ===== LISTA DE CONTAS =====
+          if (contasParaExibir.length === 0) {
+            html += `
                         <div class="empty-state">
                             <i class="ph ph-currency-circle-dollar"></i>
-                            <p>${termoBusca ? 'Nenhuma conta encontrada para "' + termoBusca + '"' : 'Nenhuma conta nesta categoria'}</p>
+                            <p>${termoBusca ? 'Nenhuma conta encontrada para "' + termoBusca + '"' : "Nenhuma conta nesta categoria"}</p>
                         </div>
                     `;
-                } else {
-                    html += `<div class="list-wrapper">`;
-                    contasParaExibir.forEach(c => {
-                        const isReceber = c.type === 'receber';
-                        const valor = parseFloat(c.amount);
-                        const isPago = c.status === 'pago';
-                        const isVencida = c.status === 'pendente' && new Date(c.due_date) < new Date();
-                        const isProxima = c.status === 'pendente' && new Date(c.due_date) >= new Date() && new Date(c.due_date) <= new Date(Date.now() + 7 * 86400000);
-                        
-                        let classeStatus = '';
-                        let badgeStatus = '';
-                        if (isPago) {
-                            classeStatus = 'item-success';
-                            badgeStatus = '<span class="item-badge badge-pago">✅ Pago</span>';
-                        } else if (isVencida) {
-                            classeStatus = 'item-danger';
-                            badgeStatus = '<span class="item-badge badge-vencido">🔴 Vencida</span>';
-                        } else if (isProxima) {
-                            classeStatus = 'item-warning';
-                            badgeStatus = '<span class="item-badge badge-pendente">⏳ Pendente</span>';
-                        } else {
-                            badgeStatus = '<span class="item-badge badge-pendente">⏳ Pendente</span>';
-                        }
+          } else {
+            html += `<div class="list-wrapper">`;
+            contasParaExibir.forEach((c) => {
+              const isReceber = c.type === "receber";
+              const valor = parseFloat(c.amount);
+              const isPago = c.status === "pago";
+              const isVencida =
+                c.status === "pendente" && new Date(c.due_date) < new Date();
+              const isProxima =
+                c.status === "pendente" &&
+                new Date(c.due_date) >= new Date() &&
+                new Date(c.due_date) <= new Date(Date.now() + 7 * 86400000);
 
-                        const dataExibicao = isPago ? c.payment_date : c.due_date;
-                        const labelData = isPago ? 'Pago em' : 'Vence em';
+              let classeStatus = "";
+              let badgeStatus = "";
+              if (isPago) {
+                classeStatus = "item-success";
+                badgeStatus =
+                  '<span class="item-badge badge-pago">✅ Pago</span>';
+              } else if (isVencida) {
+                classeStatus = "item-danger";
+                badgeStatus =
+                  '<span class="item-badge badge-vencido">🔴 Vencida</span>';
+              } else if (isProxima) {
+                classeStatus = "item-warning";
+                badgeStatus =
+                  '<span class="item-badge badge-pendente">⏳ Pendente</span>';
+              } else {
+                badgeStatus =
+                  '<span class="item-badge badge-pendente">⏳ Pendente</span>';
+              }
 
-                        html += `
+              const dataExibicao = isPago ? c.payment_date : c.due_date;
+              const labelData = isPago ? "Pago em" : "Vence em";
+
+              html += `
                             <div class="list-item ${classeStatus}" onclick="window.verDetalhesConta('${c.id}')">
                                 <div class="item-main">
-                                    <div class="item-title">${c.description || 'Sem descrição'}</div>
-                                    <div class="item-sub">${c.chart_of_accounts?.name || 'Sem categoria'} · ${labelData} ${formatDate(dataExibicao)}</div>
+                                    <div class="item-title">${c.description || "Sem descrição"}</div>
+                                    <div class="item-sub">${c.chart_of_accounts?.name || "Sem categoria"} · ${labelData} ${formatDate(dataExibicao)}</div>
                                 </div>
                                 <div class="item-right">
-                                    <div class="item-value ${isReceber ? 'item-success' : 'item-error'}">
-                                        ${isReceber ? '+' : '-'}${formatCurrency(Math.abs(valor))}
+                                    <div class="item-value ${isReceber ? "item-success" : "item-error"}">
+                                        ${isReceber ? "+" : "-"}${formatCurrency(Math.abs(valor))}
                                     </div>
                                     <div style="margin-top:2px;">${badgeStatus}</div>
                                 </div>
                             </div>
                         `;
-                    });
-                    html += `</div>`;
-                }
+            });
+            html += `</div>`;
+          }
 
-                // ===== RESUMO DO FILTRO ATUAL =====
-                if (contasParaExibir.length > 0) {
-                    const totalValor = contasParaExibir.reduce((s, c) => s + parseFloat(c.amount), 0);
-                    const totalPositivo = contasParaExibir.filter(c => parseFloat(c.amount) > 0).reduce((s, c) => s + parseFloat(c.amount), 0);
-                    const totalNegativo = contasParaExibir.filter(c => parseFloat(c.amount) < 0).reduce((s, c) => s + parseFloat(c.amount), 0);
+          // ===== RESUMO DO FILTRO ATUAL =====
+          if (contasParaExibir.length > 0) {
+            const totalValor = contasParaExibir.reduce(
+              (s, c) => s + parseFloat(c.amount),
+              0,
+            );
+            const totalPositivo = contasParaExibir
+              .filter((c) => parseFloat(c.amount) > 0)
+              .reduce((s, c) => s + parseFloat(c.amount), 0);
+            const totalNegativo = contasParaExibir
+              .filter((c) => parseFloat(c.amount) < 0)
+              .reduce((s, c) => s + parseFloat(c.amount), 0);
 
-                    html += `
+            html += `
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;">
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;text-align:center;">
                                 <div style="font-size:8px;color:var(--gray);">Total</div>
-                                <div style="font-size:14px;font-weight:700;color:${totalValor >= 0 ? 'var(--success)' : 'var(--error)'};">${formatCurrency(totalValor)}</div>
+                                <div style="font-size:14px;font-weight:700;color:${totalValor >= 0 ? "var(--success)" : "var(--error)"};">${formatCurrency(totalValor)}</div>
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(76,175,80,0.1);">
                                 <div style="font-size:8px;color:var(--gray);">Entradas</div>
@@ -1861,78 +2022,88 @@
                             </div>
                         </div>
                     `;
-                }
+          }
 
-                return html;
-            }
+          return html;
+        }
 
-            // ============================================================
-            // RENDERIZAÇÃO: RH
-            // ============================================================
-            function renderizarRH(feriasLista, funcionariosLista) {
-                const d = dadosCache;
+        // ============================================================
+        // RENDERIZAÇÃO: RH
+        // ============================================================
+        function renderizarRH(feriasLista, funcionariosLista) {
+          const d = dadosCache;
 
-                let html = `
+          let html = `
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                         <span style="font-size:12px;color:var(--gray);">${d.qtdFuncionarios} funcionários ativos</span>
                         <span style="font-size:11px;color:var(--gray-dark);">${feriasLista.length} registros de férias</span>
                     </div>
                 `;
 
-                // Funcionários em férias
-                html += `<div class="section-header"><div class="section-title" style="font-size:12px;"><i class="ph ph-sun"></i> Em Férias</div></div>`;
-                html += `<div class="list-wrapper">`;
+          // Funcionários em férias
+          html += `<div class="section-header"><div class="section-title" style="font-size:12px;"><i class="ph ph-sun"></i> Em Férias</div></div>`;
+          html += `<div class="list-wrapper">`;
 
-                const feriasAtivas = feriasLista.filter(f => f.status === 'agendada');
-                if (feriasAtivas.length === 0) {
-                    html += `
+          const feriasAtivas = feriasLista.filter(
+            (f) => f.status === "agendada",
+          );
+          if (feriasAtivas.length === 0) {
+            html += `
                         <div class="empty-state">
                             <i class="ph ph-sun"></i>
                             <p>Nenhum funcionário em férias</p>
                         </div>
                     `;
-                } else {
-                    feriasAtivas.forEach(f => {
-                        const emAndamento = new Date(f.start_date) <= new Date() && new Date(f.end_date) >= new Date();
-                        const dias = Math.ceil((new Date(f.end_date) - new Date(f.start_date)) / (1000 * 60 * 60 * 24)) + 1;
+          } else {
+            feriasAtivas.forEach((f) => {
+              const emAndamento =
+                new Date(f.start_date) <= new Date() &&
+                new Date(f.end_date) >= new Date();
+              const dias =
+                Math.ceil(
+                  (new Date(f.end_date) - new Date(f.start_date)) /
+                    (1000 * 60 * 60 * 24),
+                ) + 1;
 
-                        html += `
-                            <div class="list-item ${emAndamento ? 'item-warning' : ''}" onclick="window.verDetalhesFerias('${f.id}')">
+              html += `
+                            <div class="list-item ${emAndamento ? "item-warning" : ""}" onclick="window.verDetalhesFerias('${f.id}')">
                                 <div class="item-main">
-                                    <div class="item-title">${f.employees?.full_name || '-'}</div>
+                                    <div class="item-title">${f.employees?.full_name || "-"}</div>
                                     <div class="item-sub">${formatDate(f.start_date)} a ${formatDate(f.end_date)} · ${dias} dias</div>
                                 </div>
                                 <div class="item-right">
-                                    <span class="item-badge ${emAndamento ? 'badge-status-em_costura' : 'badge-status-recebido'}">
-                                        ${emAndamento ? 'Em andamento' : 'Agendada'}
+                                    <span class="item-badge ${emAndamento ? "badge-status-em_costura" : "badge-status-recebido"}">
+                                        ${emAndamento ? "Em andamento" : "Agendada"}
                                     </span>
                                     <div><i class="ph ph-caret-right item-arrow"></i></div>
                                 </div>
                             </div>
                         `;
-                    });
-                }
-                html += `</div>`;
+            });
+          }
+          html += `</div>`;
 
-                // Funcionários
-                html += `<div class="section-header" style="margin-top:16px;"><div class="section-title" style="font-size:12px;"><i class="ph ph-users"></i> Todos os Funcionários</div></div>`;
-                html += `<div class="list-wrapper">`;
+          // Funcionários
+          html += `<div class="section-header" style="margin-top:16px;"><div class="section-title" style="font-size:12px;"><i class="ph ph-users"></i> Todos os Funcionários</div></div>`;
+          html += `<div class="list-wrapper">`;
 
-                const funcsFiltradas = funcionariosLista.filter(f => f.active === true);
-                if (funcsFiltradas.length === 0) {
-                    html += `
+          const funcsFiltradas = funcionariosLista.filter(
+            (f) => f.active === true,
+          );
+          if (funcsFiltradas.length === 0) {
+            html += `
                         <div class="empty-state">
                             <i class="ph ph-users"></i>
-                            <p>${termoBusca ? 'Nenhum funcionário encontrado para "' + termoBusca + '"' : 'Nenhum funcionário ativo'}</p>
+                            <p>${termoBusca ? 'Nenhum funcionário encontrado para "' + termoBusca + '"' : "Nenhum funcionário ativo"}</p>
                         </div>
                     `;
-                } else {
-                    funcsFiltradas.forEach(f => {
-                        html += `
+          } else {
+            funcsFiltradas.forEach((f) => {
+              html += `
                             <div class="list-item" onclick="window.verDetalhesFuncionario('${f.id}')">
                                 <div class="item-main">
                                     <div class="item-title">${f.full_name}</div>
-                                    <div class="item-sub">${f.role || 'Sem função'} · Admissão: ${formatDate(f.admission_date)}</div>
+                                    <div class="item-sub">${f.role || "Sem função"} · Admissão: ${formatDate(f.admission_date)}</div>
                                 </div>
                                 <div class="item-right">
                                     <span class="item-badge badge-status-entregue">Ativo</span>
@@ -1940,20 +2111,20 @@
                                 </div>
                             </div>
                         `;
-                    });
-                }
-                html += `</div>`;
+            });
+          }
+          html += `</div>`;
 
-                return html;
-            }
+          return html;
+        }
 
-            // ============================================================
-            // RENDERIZAÇÃO: DÍVIDAS
-            // ============================================================
-            function renderizarDividas(parcelasLista) {
-                const d = dadosCache;
+        // ============================================================
+        // RENDERIZAÇÃO: DÍVIDAS
+        // ============================================================
+        function renderizarDividas(parcelasLista) {
+          const d = dadosCache;
 
-                let html = `
+          let html = `
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                         <span style="font-size:12px;color:var(--gray);">${parcelasLista.length} parcelas a vencer em 30 dias</span>
                         <span style="font-size:11px;color:var(--gray-dark);">Total: ${formatCurrency(parcelasLista.reduce((s, p) => s + parseFloat(p.amount), 0))}</span>
@@ -1961,189 +2132,225 @@
                     <div class="list-wrapper">
                 `;
 
-                if (parcelasLista.length === 0) {
-                    html += `
+          if (parcelasLista.length === 0) {
+            html += `
                         <div class="empty-state">
                             <i class="ph ph-warning-circle"></i>
-                            <p>${termoBusca ? 'Nenhuma parcela encontrada para "' + termoBusca + '"' : 'Nenhuma parcela a vencer nos próximos 30 dias'}</p>
+                            <p>${termoBusca ? 'Nenhuma parcela encontrada para "' + termoBusca + '"' : "Nenhuma parcela a vencer nos próximos 30 dias"}</p>
                         </div>
                     `;
-                } else {
-                    parcelasLista.forEach(p => {
-                        const diasFalta = Math.ceil((new Date(p.due_date) - new Date()) / (1000 * 60 * 60 * 24));
-                        const isUrgente = diasFalta <= 7;
+          } else {
+            parcelasLista.forEach((p) => {
+              const diasFalta = Math.ceil(
+                (new Date(p.due_date) - new Date()) / (1000 * 60 * 60 * 24),
+              );
+              const isUrgente = diasFalta <= 7;
 
-                        html += `
-                            <div class="list-item ${isUrgente ? 'item-danger' : ''}" onclick="window.verDetalhesParcela('${p.id}')">
+              html += `
+                            <div class="list-item ${isUrgente ? "item-danger" : ""}" onclick="window.verDetalhesParcela('${p.id}')">
                                 <div class="item-main">
-                                    <div class="item-title">${p.debts?.creditor || 'Credor não informado'}</div>
+                                    <div class="item-title">${p.debts?.creditor || "Credor não informado"}</div>
                                     <div class="item-sub">${p.installment_number}ª parcela · ${formatDate(p.due_date)}</div>
                                 </div>
                                 <div class="item-right">
                                     <div class="item-value item-error">${formatCurrency(p.amount)}</div>
-                                    <div style="font-size:9px;color:${isUrgente ? 'var(--error)' : 'var(--gray-dark)'};">
-                                        ${diasFalta} dias${isUrgente ? ' ⚠️' : ''}
+                                    <div style="font-size:9px;color:${isUrgente ? "var(--error)" : "var(--gray-dark)"};">
+                                        ${diasFalta} dias${isUrgente ? " ⚠️" : ""}
                                     </div>
                                 </div>
                             </div>
                         `;
-                    });
-                }
+            });
+          }
 
-                html += `</div>`;
-                return html;
-            }
+          html += `</div>`;
+          return html;
+        }
 
-            // ============================================================
-            // ALERTAS
-            // ============================================================
-            function contarAlertas() {
-                const d = dadosCache;
-                let count = 0;
-                if (d.countAtrasadas > 0) count++;
-                if (d.contasVencidas > 0) count++;
-                if (d.feriasEmAndamento.length > 0) count++;
-                if (d.parcelasDividas.length > 0) count++;
-                return count;
-            }
+        // ============================================================
+        // ALERTAS
+        // ============================================================
+        function contarAlertas() {
+          const d = dadosCache;
+          let count = 0;
+          if (d.countAtrasadas > 0) count++;
+          if (d.contasVencidas > 0) count++;
+          if (d.feriasEmAndamento.length > 0) count++;
+          if (d.parcelasDividas.length > 0) count++;
+          return count;
+        }
 
-            function renderizarAlertas() {
-                const d = dadosCache;
-                const alertas = [];
+        function renderizarAlertas() {
+          const d = dadosCache;
+          const alertas = [];
 
-                if (d.countAtrasadas > 0) {
-                    alertas.push({ prioridade: 'high', icone: 'ph-warning-circle', texto: `${d.countAtrasadas} lote(s) atrasado(s)`, tag: 'urgente', acao: 'irAba("producao")' });
-                }
-                if (d.contasVencidas > 0) {
-                    alertas.push({ prioridade: 'high', icone: 'ph-currency-circle-dollar', texto: `${d.contasVencidas} conta(s) vencida(s)`, tag: 'urgente', acao: 'irAba("financeiro")' });
-                }
-                if (d.feriasEmAndamento.length > 0) {
-                    alertas.push({ prioridade: 'medium', icone: 'ph-sun', texto: `${d.feriasEmAndamento.length} funcionário(s) em férias`, tag: 'atenção', acao: 'irAba("rh")' });
-                }
-                if (d.parcelasDividas.length > 0) {
-                    alertas.push({ prioridade: 'medium', icone: 'ph-warning', texto: `${d.parcelasDividas.length} parcela(s) de dívidas vencem em 30 dias`, tag: 'atenção', acao: 'irAba("dividas")' });
-                }
+          if (d.countAtrasadas > 0) {
+            alertas.push({
+              prioridade: "high",
+              icone: "ph-warning-circle",
+              texto: `${d.countAtrasadas} lote(s) atrasado(s)`,
+              tag: "urgente",
+              acao: 'irAba("producao")',
+            });
+          }
+          if (d.contasVencidas > 0) {
+            alertas.push({
+              prioridade: "high",
+              icone: "ph-currency-circle-dollar",
+              texto: `${d.contasVencidas} conta(s) vencida(s)`,
+              tag: "urgente",
+              acao: 'irAba("financeiro")',
+            });
+          }
+          if (d.feriasEmAndamento.length > 0) {
+            alertas.push({
+              prioridade: "medium",
+              icone: "ph-sun",
+              texto: `${d.feriasEmAndamento.length} funcionário(s) em férias`,
+              tag: "atenção",
+              acao: 'irAba("rh")',
+            });
+          }
+          if (d.parcelasDividas.length > 0) {
+            alertas.push({
+              prioridade: "medium",
+              icone: "ph-warning",
+              texto: `${d.parcelasDividas.length} parcela(s) de dívidas vencem em 30 dias`,
+              tag: "atenção",
+              acao: 'irAba("dividas")',
+            });
+          }
 
-                if (alertas.length === 0) {
-                    return `
+          if (alertas.length === 0) {
+            return `
                         <div class="alert-item alert-low">
                             <i class="ph ph-check-circle" style="color:var(--success);"></i>
                             <span class="alert-text">Tudo em dia! Nenhum alerta no momento. ✅</span>
                         </div>
                     `;
-                }
+          }
 
-                return alertas.map(a => `
+          return alertas
+            .map(
+              (a) => `
                     <div class="alert-item alert-${a.prioridade}" onclick="${a.acao}">
                         <i class="ph ${a.icone}"></i>
                         <span class="alert-text">${a.texto}</span>
                         <span class="alert-tag tag-${a.prioridade}">${a.tag}</span>
                     </div>
-                `).join('');
-            }
+                `,
+            )
+            .join("");
+        }
 
-            // ============================================================
-            // BADGES DA TAB BAR
-            // ============================================================
-            function atualizarBadges() {
-                const d = dadosCache;
+        // ============================================================
+        // BADGES DA TAB BAR
+        // ============================================================
+        function atualizarBadges() {
+          const d = dadosCache;
 
-                const prodBadge = (d.countAtrasadas || 0) + (d.countOsAtivas > 0 ? 1 : 0);
-                const tabBadgeProd = $('tabBadgeProd');
-                tabBadgeProd.textContent = prodBadge > 0 ? prodBadge : 0;
-                tabBadgeProd.style.display = prodBadge > 0 ? 'flex' : 'none';
+          const prodBadge =
+            (d.countAtrasadas || 0) + (d.countOsAtivas > 0 ? 1 : 0);
+          const tabBadgeProd = $("tabBadgeProd");
+          tabBadgeProd.textContent = prodBadge > 0 ? prodBadge : 0;
+          tabBadgeProd.style.display = prodBadge > 0 ? "flex" : "none";
 
-                const tabBadgeFin = $('tabBadgeFin');
-                tabBadgeFin.textContent = d.contasVencidas || 0;
-                tabBadgeFin.style.display = d.contasVencidas > 0 ? 'flex' : 'none';
+          const tabBadgeFin = $("tabBadgeFin");
+          tabBadgeFin.textContent = d.contasVencidas || 0;
+          tabBadgeFin.style.display = d.contasVencidas > 0 ? "flex" : "none";
 
-                const tabBadgeRH = $('tabBadgeRH');
-                tabBadgeRH.textContent = d.feriasEmAndamento.length || 0;
-                tabBadgeRH.style.display = d.feriasEmAndamento.length > 0 ? 'flex' : 'none';
+          const tabBadgeRH = $("tabBadgeRH");
+          tabBadgeRH.textContent = d.feriasEmAndamento.length || 0;
+          tabBadgeRH.style.display =
+            d.feriasEmAndamento.length > 0 ? "flex" : "none";
 
-                const tabBadgeDiv = $('tabBadgeDiv');
-                tabBadgeDiv.textContent = d.parcelasDividas.length || 0;
-                tabBadgeDiv.style.display = d.parcelasDividas.length > 0 ? 'flex' : 'none';
-            }
+          const tabBadgeDiv = $("tabBadgeDiv");
+          tabBadgeDiv.textContent = d.parcelasDividas.length || 0;
+          tabBadgeDiv.style.display =
+            d.parcelasDividas.length > 0 ? "flex" : "none";
+        }
 
-            // ============================================================
-            // FILTRO FINANCEIRO
-            // ============================================================
-            function setFiltroFinanceiro(filtro) {
-                filtroFinanceiro = filtro;
-                document.querySelectorAll('.filter-tab').forEach(tab => {
-                    tab.classList.toggle('active', tab.dataset.filtro === filtro);
-                });
-                renderizarConteudo();
-            }
+        // ============================================================
+        // FILTRO FINANCEIRO
+        // ============================================================
+        function setFiltroFinanceiro(filtro) {
+          filtroFinanceiro = filtro;
+          document.querySelectorAll(".filter-tab").forEach((tab) => {
+            tab.classList.toggle("active", tab.dataset.filtro === filtro);
+          });
+          renderizarConteudo();
+        }
 
-            // ============================================================
-            // NAVEGAÇÃO ENTRE ABAS
-            // ============================================================
-            function irAba(aba) {
-                if (aba === abaAtual) {
-                    carregarDados();
-                    return;
-                }
+        // ============================================================
+        // NAVEGAÇÃO ENTRE ABAS
+        // ============================================================
+        function irAba(aba) {
+          if (aba === abaAtual) {
+            carregarDados();
+            return;
+          }
 
-                abaAtual = aba;
-                document.querySelectorAll('.tab-item').forEach(tab => {
-                    tab.classList.toggle('active', tab.dataset.tab === aba);
-                });
+          abaAtual = aba;
+          document.querySelectorAll(".tab-item").forEach((tab) => {
+            tab.classList.toggle("active", tab.dataset.tab === aba);
+          });
 
-                // Limpa busca ao trocar de aba
-                termoBusca = '';
-                searchInput.value = '';
-                clearSearch.classList.remove('visible');
+          // Limpa busca ao trocar de aba
+          termoBusca = "";
+          searchInput.value = "";
+          clearSearch.classList.remove("visible");
 
-                // Reseta filtro do financeiro ao entrar na aba
-                if (aba === 'financeiro') {
-                    filtroFinanceiro = 'todas';
-                }
+          // Reseta filtro do financeiro ao entrar na aba
+          if (aba === "financeiro") {
+            filtroFinanceiro = "todas";
+          }
 
-                renderizarConteudo();
-                appContent.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+          renderizarConteudo();
+          appContent.scrollTo({ top: 0, behavior: "smooth" });
+        }
 
-            // ============================================================
-            // MODAL - DETALHES
-            // ============================================================
-            function abrirModal(titulo, conteudo) {
-                modalTitle.innerHTML = titulo;
-                modalBody.innerHTML = conteudo;
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
+        // ============================================================
+        // MODAL - DETALHES
+        // ============================================================
+        function abrirModal(titulo, conteudo) {
+          modalTitle.innerHTML = titulo;
+          modalBody.innerHTML = conteudo;
+          modalOverlay.classList.add("active");
+          document.body.style.overflow = "hidden";
+        }
 
-            function fecharModal() {
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-            }
+        function fecharModal() {
+          modalOverlay.classList.remove("active");
+          document.body.style.overflow = "";
+        }
 
-            // ============================================================
-            // DETALHES: OS
-            // ============================================================
-            async function verDetalhesOS(id) {
-                try {
-                    const { data: os, error } = await supabaseClient
-                        .from('service_orders')
-                        .select('*, customers(company_name, trade_name, contact_name, phone)')
-                        .eq('id', id)
-                        .single();
+        // ============================================================
+        // DETALHES: OS
+        // ============================================================
+        async function verDetalhesOS(id) {
+          try {
+            const { data: os, error } = await supabaseClient
+              .from("service_orders")
+              .select(
+                "*, customers(company_name, trade_name, contact_name, phone)",
+              )
+              .eq("id", id)
+              .single();
 
-                    if (error) throw error;
+            if (error) throw error;
 
-                    const cliente = os.customers?.trade_name || os.customers?.company_name || '-';
-                    const valorTotal = os.total || os.total_quantity * os.unit_price;
-                    const atrasado = new Date(os.expected_delivery) < new Date();
+            const cliente =
+              os.customers?.trade_name || os.customers?.company_name || "-";
+            const valorTotal = os.total || os.total_quantity * os.unit_price;
+            const atrasado = new Date(os.expected_delivery) < new Date();
 
-                    let html = `
+            let html = `
                         <div style="margin-bottom:16px;">
                             <div style="display:flex;justify-content:space-between;align-items:center;">
                                 <h4 style="color:var(--gold-light);">${os.order_number}</h4>
                                 <span class="item-badge ${getStatusClass(os.status)}">${formatStatus(os.status)}</span>
                             </div>
-                            <p style="color:var(--gray);font-size:12px;margin-top:4px;">${os.product_description || 'Sem descrição'}</p>
+                            <p style="color:var(--gray);font-size:12px;margin-top:4px;">${os.product_description || "Sem descrição"}</p>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
@@ -2158,114 +2365,144 @@
                                 <div style="font-size:9px;color:var(--gray);">Recebimento</div>
                                 <div style="font-weight:600;">${formatDate(os.received_date)}</div>
                             </div>
-                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;${atrasado ? 'border:1px solid var(--error);' : ''}">
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;${atrasado ? "border:1px solid var(--error);" : ""}">
                                 <div style="font-size:9px;color:var(--gray);">Prazo</div>
-                                <div style="font-weight:600;${atrasado ? 'color:var(--error);' : ''}">${formatDate(os.expected_delivery)}</div>
+                                <div style="font-weight:600;${atrasado ? "color:var(--error);" : ""}">${formatDate(os.expected_delivery)}</div>
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
                                 <div style="font-size:9px;color:var(--gray);">Valor Total</div>
                                 <div style="font-weight:700;font-size:18px;color:var(--gold-light);">${formatCurrency(valorTotal)}</div>
                             </div>
                         </div>
-                        ${os.notes ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;font-size:12px;color:var(--gray);"><strong>Obs:</strong> ${os.notes}</div>` : ''}
+                        ${os.notes ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;font-size:12px;color:var(--gray);"><strong>Obs:</strong> ${os.notes}</div>` : ""}
                         <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
                             <button onclick="window.irAba('producao');window.fecharModal();" style="flex:1;background:var(--gold);border:none;border-radius:10px;padding:10px;font-weight:600;color:#000;cursor:pointer;">Ver na Produção</button>
                             <button onclick="window.fecharModal();" style="flex:1;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
                         </div>
                     `;
 
-                    abrirModal(`<i class="ph ph-files"></i> ${os.order_number}`, html);
-                } catch (e) {
-                    console.error('Erro ao buscar detalhes da OS:', e);
-                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes da OS.</p>`);
-                }
-            }
+            abrirModal(`<i class="ph ph-files"></i> ${os.order_number}`, html);
+          } catch (e) {
+            console.error("Erro ao buscar detalhes da OS:", e);
+            abrirModal(
+              '<i class="ph ph-warning-circle"></i> Erro',
+              `<p style="color:var(--gray);">Não foi possível carregar os detalhes da OS.</p>`,
+            );
+          }
+        }
 
-            // ============================================================
-            // DETALHES: CONTA
-            // ============================================================
-            async function verDetalhesConta(id) {
-                try {
-                    const { data: conta, error } = await supabaseClient
-                        .from('financial_transactions')
-                        .select('*, chart_of_accounts(name, type)')
-                        .eq('id', id)
-                        .single();
+        // ============================================================
+        // DETALHES: CONTA
+        // ============================================================
+        async function verDetalhesConta(id) {
+          try {
+            const { data: conta, error } = await supabaseClient
+              .from("financial_transactions")
+              .select("*, chart_of_accounts(name, type)")
+              .eq("id", id)
+              .single();
 
-                    if (error) throw error;
+            if (error) throw error;
 
-                    const isReceber = conta.type === 'receber';
-                    const isPago = conta.status === 'pago';
-                    const isVencida = conta.status === 'pendente' && new Date(conta.due_date) < new Date();
-                    const diasFalta = isPago ? 0 : Math.ceil((new Date(conta.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+            const isReceber = conta.type === "receber";
+            const isPago = conta.status === "pago";
+            const isVencida =
+              conta.status === "pendente" &&
+              new Date(conta.due_date) < new Date();
+            const diasFalta = isPago
+              ? 0
+              : Math.ceil(
+                  (new Date(conta.due_date) - new Date()) /
+                    (1000 * 60 * 60 * 24),
+                );
 
-                    let statusBadge = '';
-                    if (isPago) statusBadge = '<span class="item-badge badge-pago">✅ Pago</span>';
-                    else if (isVencida) statusBadge = '<span class="item-badge badge-vencido">🔴 Vencida</span>';
-                    else if (diasFalta <= 2) statusBadge = '<span class="item-badge badge-pendente">⏳ Urgente</span>';
-                    else statusBadge = '<span class="item-badge badge-pendente">⏳ Pendente</span>';
+            let statusBadge = "";
+            if (isPago)
+              statusBadge =
+                '<span class="item-badge badge-pago">✅ Pago</span>';
+            else if (isVencida)
+              statusBadge =
+                '<span class="item-badge badge-vencido">🔴 Vencida</span>';
+            else if (diasFalta <= 2)
+              statusBadge =
+                '<span class="item-badge badge-pendente">⏳ Urgente</span>';
+            else
+              statusBadge =
+                '<span class="item-badge badge-pendente">⏳ Pendente</span>';
 
-                    let html = `
+            let html = `
                         <div style="margin-bottom:16px;">
                             <div style="display:flex;justify-content:space-between;align-items:center;">
-                                <h4 style="color:${isReceber ? 'var(--success)' : 'var(--error)'};">${isReceber ? '📈 A Receber' : '📉 A Pagar'}</h4>
+                                <h4 style="color:${isReceber ? "var(--success)" : "var(--error)"};">${isReceber ? "📈 A Receber" : "📉 A Pagar"}</h4>
                                 ${statusBadge}
                             </div>
-                            <p style="color:var(--white);font-size:14px;font-weight:600;margin-top:4px;">${conta.description || 'Sem descrição'}</p>
+                            <p style="color:var(--white);font-size:14px;font-weight:600;margin-top:4px;">${conta.description || "Sem descrição"}</p>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
                                 <div style="font-size:9px;color:var(--gray);">Categoria</div>
-                                <div style="font-weight:600;">${conta.chart_of_accounts?.name || '-'}</div>
+                                <div style="font-weight:600;">${conta.chart_of_accounts?.name || "-"}</div>
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
                                 <div style="font-size:9px;color:var(--gray);">Data</div>
                                 <div style="font-weight:600;">${formatDate(conta.date)}</div>
                             </div>
-                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;${isVencida ? 'border:1px solid var(--error);' : ''}">
-                                <div style="font-size:9px;color:var(--gray);">${isPago ? 'Pago em' : 'Vencimento'}</div>
-                                <div style="font-weight:600;${isVencida ? 'color:var(--error);' : ''}">${formatDate(isPago ? conta.payment_date : conta.due_date)}</div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;${isVencida ? "border:1px solid var(--error);" : ""}">
+                                <div style="font-size:9px;color:var(--gray);">${isPago ? "Pago em" : "Vencimento"}</div>
+                                <div style="font-weight:600;${isVencida ? "color:var(--error);" : ""}">${formatDate(isPago ? conta.payment_date : conta.due_date)}</div>
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
                                 <div style="font-size:9px;color:var(--gray);">Forma</div>
-                                <div style="font-weight:600;">${conta.payment_method || '-'}</div>
+                                <div style="font-weight:600;">${conta.payment_method || "-"}</div>
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
                                 <div style="font-size:9px;color:var(--gray);">Valor</div>
-                                <div style="font-weight:700;font-size:20px;color:${isReceber ? 'var(--success)' : 'var(--error)'};">${formatCurrency(Math.abs(conta.amount))}</div>
+                                <div style="font-weight:700;font-size:20px;color:${isReceber ? "var(--success)" : "var(--error)"};">${formatCurrency(Math.abs(conta.amount))}</div>
                             </div>
                         </div>
-                        ${conta.notes ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;font-size:12px;color:var(--gray);"><strong>Obs:</strong> ${conta.notes}</div>` : ''}
+                        ${conta.notes ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;font-size:12px;color:var(--gray);"><strong>Obs:</strong> ${conta.notes}</div>` : ""}
                         <button onclick="window.fecharModal();" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
                     `;
 
-                    abrirModal(`<i class="ph ph-currency-circle-dollar"></i> ${conta.description || 'Detalhes'}`, html);
-                } catch (e) {
-                    console.error('Erro ao buscar detalhes da conta:', e);
-                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes da conta.</p>`);
-                }
-            }
+            abrirModal(
+              `<i class="ph ph-currency-circle-dollar"></i> ${conta.description || "Detalhes"}`,
+              html,
+            );
+          } catch (e) {
+            console.error("Erro ao buscar detalhes da conta:", e);
+            abrirModal(
+              '<i class="ph ph-warning-circle"></i> Erro',
+              `<p style="color:var(--gray);">Não foi possível carregar os detalhes da conta.</p>`,
+            );
+          }
+        }
 
-            // ============================================================
-            // DETALHES: FÉRIAS
-            // ============================================================
-            async function verDetalhesFerias(id) {
-                try {
-                    const { data: ferias, error } = await supabaseClient
-                        .from('employee_vacations')
-                        .select('*, employees(full_name, role)')
-                        .eq('id', id)
-                        .single();
+        // ============================================================
+        // DETALHES: FÉRIAS
+        // ============================================================
+        async function verDetalhesFerias(id) {
+          try {
+            const { data: ferias, error } = await supabaseClient
+              .from("employee_vacations")
+              .select("*, employees(full_name, role)")
+              .eq("id", id)
+              .single();
 
-                    if (error) throw error;
+            if (error) throw error;
 
-                    const dias = Math.ceil((new Date(ferias.end_date) - new Date(ferias.start_date)) / (1000 * 60 * 60 * 24)) + 1;
-                    const emAndamento = new Date(ferias.start_date) <= new Date() && new Date(ferias.end_date) >= new Date();
+            const dias =
+              Math.ceil(
+                (new Date(ferias.end_date) - new Date(ferias.start_date)) /
+                  (1000 * 60 * 60 * 24),
+              ) + 1;
+            const emAndamento =
+              new Date(ferias.start_date) <= new Date() &&
+              new Date(ferias.end_date) >= new Date();
 
-                    let html = `
+            let html = `
                         <div style="margin-bottom:16px;">
-                            <h4 style="color:var(--gold-light);">${ferias.employees?.full_name || 'Funcionário'}</h4>
-                            <p style="color:var(--gray);font-size:12px;">${ferias.employees?.role || 'Sem função'}</p>
+                            <h4 style="color:var(--gold-light);">${ferias.employees?.full_name || "Funcionário"}</h4>
+                            <p style="color:var(--gray);font-size:12px;">${ferias.employees?.role || "Sem função"}</p>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
@@ -2280,48 +2517,54 @@
                                 <div style="font-size:9px;color:var(--gray);">Dias</div>
                                 <div style="font-weight:600;">${dias} dias</div>
                             </div>
-                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;${emAndamento ? 'border:1px solid var(--warning);' : ''}">
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;${emAndamento ? "border:1px solid var(--warning);" : ""}">
                                 <div style="font-size:9px;color:var(--gray);">Status</div>
-                                <div style="font-weight:600;${emAndamento ? 'color:var(--warning);' : ''}">${emAndamento ? '🟡 Em andamento' : ferias.status === 'agendada' ? '📅 Agendada' : '✅ Concluída'}</div>
+                                <div style="font-weight:600;${emAndamento ? "color:var(--warning);" : ""}">${emAndamento ? "🟡 Em andamento" : ferias.status === "agendada" ? "📅 Agendada" : "✅ Concluída"}</div>
                             </div>
                         </div>
-                        ${ferias.notes ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;font-size:12px;color:var(--gray);"><strong>Obs:</strong> ${ferias.notes}</div>` : ''}
+                        ${ferias.notes ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;font-size:12px;color:var(--gray);"><strong>Obs:</strong> ${ferias.notes}</div>` : ""}
                         <button onclick="window.fecharModal();" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
                     `;
 
-                    abrirModal(`<i class="ph ph-sun"></i> Férias - ${ferias.employees?.full_name || 'Funcionário'}`, html);
-                } catch (e) {
-                    console.error('Erro ao buscar detalhes das férias:', e);
-                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes das férias.</p>`);
-                }
-            }
+            abrirModal(
+              `<i class="ph ph-sun"></i> Férias - ${ferias.employees?.full_name || "Funcionário"}`,
+              html,
+            );
+          } catch (e) {
+            console.error("Erro ao buscar detalhes das férias:", e);
+            abrirModal(
+              '<i class="ph ph-warning-circle"></i> Erro',
+              `<p style="color:var(--gray);">Não foi possível carregar os detalhes das férias.</p>`,
+            );
+          }
+        }
 
-            // ============================================================
-            // DETALHES: FUNCIONÁRIO
-            // ============================================================
-            async function verDetalhesFuncionario(id) {
-                try {
-                    const { data: func, error } = await supabaseClient
-                        .from('employees')
-                        .select('*')
-                        .eq('id', id)
-                        .single();
+        // ============================================================
+        // DETALHES: FUNCIONÁRIO
+        // ============================================================
+        async function verDetalhesFuncionario(id) {
+          try {
+            const { data: func, error } = await supabaseClient
+              .from("employees")
+              .select("*")
+              .eq("id", id)
+              .single();
 
-                    if (error) throw error;
+            if (error) throw error;
 
-                    const { data: ferias } = await supabaseClient
-                        .from('employee_vacations')
-                        .select('*')
-                        .eq('employee_id', id)
-                        .eq('status', 'agendada')
-                        .order('start_date', { ascending: true });
+            const { data: ferias } = await supabaseClient
+              .from("employee_vacations")
+              .select("*")
+              .eq("employee_id", id)
+              .eq("status", "agendada")
+              .order("start_date", { ascending: true });
 
-                    const feriasProx = ferias && ferias.length > 0 ? ferias[0] : null;
+            const feriasProx = ferias && ferias.length > 0 ? ferias[0] : null;
 
-                    let html = `
+            let html = `
                         <div style="margin-bottom:16px;">
                             <h4 style="color:var(--gold-light);">${func.full_name}</h4>
-                            <p style="color:var(--gray);font-size:12px;">${func.role || 'Sem função'} · ${func.contract_type === 'clt' ? 'CLT' : 'Diarista'}</p>
+                            <p style="color:var(--gray);font-size:12px;">${func.role || "Sem função"} · ${func.contract_type === "clt" ? "CLT" : "Diarista"}</p>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
@@ -2330,46 +2573,59 @@
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
                                 <div style="font-size:9px;color:var(--gray);">Status</div>
-                                <div style="font-weight:600;color:${func.active ? 'var(--success)' : 'var(--error)'};">${func.active ? '✅ Ativo' : '❌ Inativo'}</div>
+                                <div style="font-weight:600;color:${func.active ? "var(--success)" : "var(--error)"};">${func.active ? "✅ Ativo" : "❌ Inativo"}</div>
                             </div>
-                            ${func.phone_cell ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
+                            ${
+                              func.phone_cell
+                                ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
                                 <div style="font-size:9px;color:var(--gray);">Contato</div>
                                 <div style="font-weight:600;">${func.phone_cell}</div>
-                            </div>` : ''}
-                            ${feriasProx ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;border:1px solid rgba(255,193,7,0.2);">
+                            </div>`
+                                : ""
+                            }
+                            ${
+                              feriasProx
+                                ? `<div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;border:1px solid rgba(255,193,7,0.2);">
                                 <div style="font-size:9px;color:var(--gray);">Próximas Férias</div>
                                 <div style="font-weight:600;color:var(--warning);">${formatDate(feriasProx.start_date)} a ${formatDate(feriasProx.end_date)}</div>
-                            </div>` : ''}
+                            </div>`
+                                : ""
+                            }
                         </div>
                         <button onclick="window.fecharModal();" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
                     `;
 
-                    abrirModal(`<i class="ph ph-user"></i> ${func.full_name}`, html);
-                } catch (e) {
-                    console.error('Erro ao buscar detalhes do funcionário:', e);
-                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes do funcionário.</p>`);
-                }
-            }
+            abrirModal(`<i class="ph ph-user"></i> ${func.full_name}`, html);
+          } catch (e) {
+            console.error("Erro ao buscar detalhes do funcionário:", e);
+            abrirModal(
+              '<i class="ph ph-warning-circle"></i> Erro',
+              `<p style="color:var(--gray);">Não foi possível carregar os detalhes do funcionário.</p>`,
+            );
+          }
+        }
 
-            // ============================================================
-            // DETALHES: PARCELA
-            // ============================================================
-            async function verDetalhesParcela(id) {
-                try {
-                    const { data: parcela, error } = await supabaseClient
-                        .from('debt_installments')
-                        .select('*, debts(id, creditor, type, total_amount, status)')
-                        .eq('id', id)
-                        .single();
+        // ============================================================
+        // DETALHES: PARCELA
+        // ============================================================
+        async function verDetalhesParcela(id) {
+          try {
+            const { data: parcela, error } = await supabaseClient
+              .from("debt_installments")
+              .select("*, debts(id, creditor, type, total_amount, status)")
+              .eq("id", id)
+              .single();
 
-                    if (error) throw error;
+            if (error) throw error;
 
-                    const diasFalta = Math.ceil((new Date(parcela.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+            const diasFalta = Math.ceil(
+              (new Date(parcela.due_date) - new Date()) / (1000 * 60 * 60 * 24),
+            );
 
-                    let html = `
+            let html = `
                         <div style="margin-bottom:16px;">
-                            <h4 style="color:var(--gold-light);">${parcela.debts?.creditor || 'Credor não informado'}</h4>
-                            <p style="color:var(--gray);font-size:12px;">${parcela.debts?.type || 'Tipo não informado'} · ${parcela.debts?.status === 'ativa' ? '🟡 Ativa' : '✅ Quitada'}</p>
+                            <h4 style="color:var(--gold-light);">${parcela.debts?.creditor || "Credor não informado"}</h4>
+                            <p style="color:var(--gray);font-size:12px;">${parcela.debts?.type || "Tipo não informado"} · ${parcela.debts?.status === "ativa" ? "🟡 Ativa" : "✅ Quitada"}</p>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
@@ -2378,7 +2634,7 @@
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
                                 <div style="font-size:9px;color:var(--gray);">Vencimento</div>
-                                <div style="font-weight:600;${diasFalta <= 7 ? 'color:var(--error);' : ''}">${formatDate(parcela.due_date)}</div>
+                                <div style="font-weight:600;${diasFalta <= 7 ? "color:var(--error);" : ""}">${formatDate(parcela.due_date)}</div>
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
                                 <div style="font-size:9px;color:var(--gray);">Valor</div>
@@ -2392,141 +2648,160 @@
                         <button onclick="window.fecharModal();" style="margin-top:12px;width:100%;background:rgba(255,255,255,0.05);border:none;border-radius:10px;padding:10px;font-weight:600;color:var(--gray);cursor:pointer;">Fechar</button>
                     `;
 
-                    abrirModal(`<i class="ph ph-warning-circle"></i> ${parcela.debts?.creditor || 'Parcela'}`, html);
-                } catch (e) {
-                    console.error('Erro ao buscar detalhes da parcela:', e);
-                    abrirModal('<i class="ph ph-warning-circle"></i> Erro', `<p style="color:var(--gray);">Não foi possível carregar os detalhes da parcela.</p>`);
-                }
+            abrirModal(
+              `<i class="ph ph-warning-circle"></i> ${parcela.debts?.creditor || "Parcela"}`,
+              html,
+            );
+          } catch (e) {
+            console.error("Erro ao buscar detalhes da parcela:", e);
+            abrirModal(
+              '<i class="ph ph-warning-circle"></i> Erro',
+              `<p style="color:var(--gray);">Não foi possível carregar os detalhes da parcela.</p>`,
+            );
+          }
+        }
+
+        // ============================================================
+        // NAVEGAÇÃO E INTERAÇÃO
+        // ============================================================
+        window.setFiltroFinanceiro = setFiltroFinanceiro;
+        window.irAba = irAba;
+        window.fecharModal = fecharModal;
+        window.verDetalhesOS = verDetalhesOS;
+        window.verDetalhesConta = verDetalhesConta;
+        window.verDetalhesFerias = verDetalhesFerias;
+        window.verDetalhesFuncionario = verDetalhesFuncionario;
+        window.verDetalhesParcela = verDetalhesParcela;
+        window.carregarDados = carregarDados;
+
+        // ============================================================
+        // EVENTOS
+        // ============================================================
+        appContent.addEventListener("scroll", function () {
+          scrollTopBtn.classList.toggle("visible", this.scrollTop > 200);
+        });
+
+        scrollTopBtn.addEventListener("click", function () {
+          appContent.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        $("btnRefresh").addEventListener("click", carregarDados);
+
+        modalClose.addEventListener("click", fecharModal);
+        modalOverlay.addEventListener("click", function (e) {
+          if (e.target === this) fecharModal();
+        });
+
+        searchInput.addEventListener("input", function () {
+          termoBusca = this.value.trim();
+          clearSearch.classList.toggle("visible", termoBusca.length > 0);
+          renderizarConteudo();
+        });
+
+        clearSearch.addEventListener("click", function () {
+          searchInput.value = "";
+          termoBusca = "";
+          clearSearch.classList.remove("visible");
+          renderizarConteudo();
+        });
+
+        document.querySelectorAll(".tab-item").forEach((tab) => {
+          tab.addEventListener("click", function () {
+            irAba(this.dataset.tab);
+          });
+        });
+
+        // Pull to refresh
+        let touchStartY = 0;
+        let touchMoved = false;
+
+        appContent.addEventListener(
+          "touchstart",
+          function (e) {
+            if (this.scrollTop === 0) {
+              touchStartY = e.touches[0].clientY;
+              touchMoved = false;
             }
+          },
+          { passive: true },
+        );
 
-            // ============================================================
-            // NAVEGAÇÃO E INTERAÇÃO
-            // ============================================================
-            window.setFiltroFinanceiro = setFiltroFinanceiro;
-            window.irAba = irAba;
-            window.fecharModal = fecharModal;
-            window.verDetalhesOS = verDetalhesOS;
-            window.verDetalhesConta = verDetalhesConta;
-            window.verDetalhesFerias = verDetalhesFerias;
-            window.verDetalhesFuncionario = verDetalhesFuncionario;
-            window.verDetalhesParcela = verDetalhesParcela;
-            window.carregarDados = carregarDados;
+        appContent.addEventListener(
+          "touchmove",
+          function (e) {
+            if (this.scrollTop === 0 && touchStartY > 0) {
+              const deltaY = e.touches[0].clientY - touchStartY;
+              if (deltaY > 40) {
+                touchMoved = true;
+                pullIndicator.classList.add("active");
+                pullIndicator.innerHTML =
+                  '<i class="ph ph-arrow-down"></i> Solte para atualizar';
+              } else if (deltaY > 10) {
+                pullIndicator.classList.add("active");
+                pullIndicator.innerHTML =
+                  '<i class="ph ph-arrow-down"></i> Puxe para atualizar';
+              } else {
+                pullIndicator.classList.remove("active");
+              }
+            }
+          },
+          { passive: true },
+        );
 
-            // ============================================================
-            // EVENTOS
-            // ============================================================
-            appContent.addEventListener('scroll', function() {
-                scrollTopBtn.classList.toggle('visible', this.scrollTop > 200);
-            });
+        appContent.addEventListener(
+          "touchend",
+          function (e) {
+            if (touchMoved && this.scrollTop === 0) {
+              pullIndicator.innerHTML =
+                '<i class="ph ph-spinner spinning"></i> Atualizando...';
+              carregarDados().then(() => {
+                pullIndicator.classList.remove("active");
+              });
+            }
+            touchStartY = 0;
+            touchMoved = false;
+          },
+          { passive: true },
+        );
 
-            scrollTopBtn.addEventListener('click', function() {
-                appContent.scrollTo({ top: 0, behavior: 'smooth' });
-            });
+        // ============================================================
+        // INICIALIZAÇÃO
+        // ============================================================
+        document.addEventListener("DOMContentLoaded", async function () {
+          console.log("🚀 App iniciado");
 
-            $('btnRefresh').addEventListener('click', carregarDados);
+          conectado = await testarConexao();
+          await carregarDados();
 
-            modalClose.addEventListener('click', fecharModal);
-            modalOverlay.addEventListener('click', function(e) {
-                if (e.target === this) fecharModal();
-            });
+          setInterval(async () => {
+            if (navigator.onLine) {
+              await carregarDados();
+            } else {
+              statusDot.className = "dot offline";
+              statusText.textContent = "Offline";
+            }
+          }, 60000);
 
-            searchInput.addEventListener('input', function() {
-                termoBusca = this.value.trim();
-                clearSearch.classList.toggle('visible', termoBusca.length > 0);
-                renderizarConteudo();
-            });
+          window.addEventListener("online", async function () {
+            statusDot.className = "dot online";
+            statusText.textContent = "Online";
+            await carregarDados();
+          });
 
-            clearSearch.addEventListener('click', function() {
-                searchInput.value = '';
-                termoBusca = '';
-                clearSearch.classList.remove('visible');
-                renderizarConteudo();
-            });
+          window.addEventListener("offline", function () {
+            statusDot.className = "dot offline";
+            statusText.textContent = "Offline";
+          });
+        });
 
-            document.querySelectorAll('.tab-item').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    irAba(this.dataset.tab);
-                });
-            });
-
-            // Pull to refresh
-            let touchStartY = 0;
-            let touchMoved = false;
-
-            appContent.addEventListener('touchstart', function(e) {
-                if (this.scrollTop === 0) {
-                    touchStartY = e.touches[0].clientY;
-                    touchMoved = false;
-                }
-            }, { passive: true });
-
-            appContent.addEventListener('touchmove', function(e) {
-                if (this.scrollTop === 0 && touchStartY > 0) {
-                    const deltaY = e.touches[0].clientY - touchStartY;
-                    if (deltaY > 40) {
-                        touchMoved = true;
-                        pullIndicator.classList.add('active');
-                        pullIndicator.innerHTML = '<i class="ph ph-arrow-down"></i> Solte para atualizar';
-                    } else if (deltaY > 10) {
-                        pullIndicator.classList.add('active');
-                        pullIndicator.innerHTML = '<i class="ph ph-arrow-down"></i> Puxe para atualizar';
-                    } else {
-                        pullIndicator.classList.remove('active');
-                    }
-                }
-            }, { passive: true });
-
-            appContent.addEventListener('touchend', function(e) {
-                if (touchMoved && this.scrollTop === 0) {
-                    pullIndicator.innerHTML = '<i class="ph ph-spinner spinning"></i> Atualizando...';
-                    carregarDados().then(() => {
-                        pullIndicator.classList.remove('active');
-                    });
-                }
-                touchStartY = 0;
-                touchMoved = false;
-            }, { passive: true });
-
-            // ============================================================
-            // INICIALIZAÇÃO
-            // ============================================================
-            document.addEventListener('DOMContentLoaded', async function() {
-                console.log('🚀 App iniciado');
-
-                conectado = await testarConexao();
-                await carregarDados();
-
-                setInterval(async () => {
-                    if (navigator.onLine) {
-                        await carregarDados();
-                    } else {
-                        statusDot.className = 'dot offline';
-                        statusText.textContent = 'Offline';
-                    }
-                }, 60000);
-
-                window.addEventListener('online', async function() {
-                    statusDot.className = 'dot online';
-                    statusText.textContent = 'Online';
-                    await carregarDados();
-                });
-
-                window.addEventListener('offline', function() {
-                    statusDot.className = 'dot offline';
-                    statusText.textContent = 'Offline';
-                });
-            });
-
-            console.log('✅ App Profissional pronto!');
-            console.log('💡 Funcionalidades:');
-            console.log('  • Clique em qualquer item para ver detalhes');
-            console.log('  • Use a busca para filtrar dados');
-            console.log('  • Puxe para baixo para atualizar');
-            console.log('  • Navegue pelas abas inferiores');
-            console.log('  • Módulo Financeiro completo com filtros');
-
-        })();
+        console.log("✅ App Profissional pronto!");
+        console.log("💡 Funcionalidades:");
+        console.log("  • Clique em qualquer item para ver detalhes");
+        console.log("  • Use a busca para filtrar dados");
+        console.log("  • Puxe para baixo para atualizar");
+        console.log("  • Navegue pelas abas inferiores");
+        console.log("  • Módulo Financeiro completo com filtros");
+      })();
     </script>
-
-</body>
+  </body>
 </html>
