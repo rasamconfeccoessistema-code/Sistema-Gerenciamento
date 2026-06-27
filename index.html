@@ -53,7 +53,6 @@
             touch-action: manipulation;
         }
 
-        /* ========== APP CONTAINER ========== */
         .app-container {
             display: flex;
             flex-direction: column;
@@ -388,6 +387,45 @@
             transform: scale(0.95);
         }
 
+        /* ========== FILTROS RÁPIDOS ========== */
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .filter-tabs::-webkit-scrollbar {
+            height: 2px;
+        }
+        .filter-tabs::-webkit-scrollbar-thumb {
+            background: var(--gold-dark);
+            border-radius: 10px;
+        }
+
+        .filter-tab {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .filter-tab:active {
+            transform: scale(0.95);
+        }
+        .filter-tab.active {
+            background: rgba(212, 160, 23, 0.15);
+            border-color: var(--gold);
+            color: var(--gold-light);
+        }
+
         /* ========== ALERTAS ========== */
         .alert-list {
             display: flex;
@@ -562,6 +600,19 @@
         .badge-status-em_revisao {
             background: rgba(255, 193, 7, 0.2);
             color: #ffe082;
+        }
+
+        .badge-pago {
+            background: rgba(76, 175, 80, 0.15);
+            color: #a5d6a7;
+        }
+        .badge-pendente {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffe082;
+        }
+        .badge-vencido {
+            background: rgba(255, 82, 82, 0.15);
+            color: #ff8a80;
         }
 
         .item-danger .item-title {
@@ -854,6 +905,10 @@
             .list-item .item-title {
                 font-size: 12px;
             }
+            .filter-tab {
+                font-size: 10px;
+                padding: 3px 10px;
+            }
         }
 
         @media (min-width: 501px) {
@@ -1103,6 +1158,7 @@
             let carregando = false;
             let abaAtual = 'geral';
             let termoBusca = '';
+            let filtroFinanceiro = 'todas';
             let dadosCache = {
                 osAtivas: [],
                 countOsAtivas: 0,
@@ -1113,12 +1169,15 @@
                 despesas: 0,
                 contasVencidas: 0,
                 contasProximas: [],
+                contasPagas: [],
+                todasContas: [],
                 qtdFuncionarios: 0,
                 ferias: [],
                 feriasEmAndamento: [],
                 parcelasDividas: [],
                 todasOS: [],
-                funcionarios: []
+                funcionarios: [],
+                saldoAtual: 0
             };
             let conectado = false;
 
@@ -1188,7 +1247,7 @@
                     if (errOs) console.error('  ❌ Erro OS:', errOs);
                     else console.log(`  ✅ ${countOsAtivas || 0} OS ativas`);
 
-                    // ===== 2. Todas OS (para busca) =====
+                    // ===== 2. Todas OS =====
                     const { data: todasOS, error: errTodasOS } = await supabaseClient
                         .from('service_orders')
                         .select('id, order_number, customer_id, total_quantity, status, expected_delivery, received_date, product_description, customers(company_name, trade_name)')
@@ -1237,51 +1296,81 @@
                     if (errRec) console.error('  ❌ Erro produção:', errRec);
                     const pecasHoje = recordsHoje ? recordsHoje.reduce((s, r) => s + r.pieces_sewn, 0) : 0;
 
-                    // ===== 7. Financeiro - Saldo do mês =====
+                    // ===== 7. FINANCEIRO COMPLETO =====
                     const primeiroDiaMes = new Date();
                     primeiroDiaMes.setDate(1);
                     const primeiroDiaStr = primeiroDiaMes.toISOString().split('T')[0];
                     const ultimoDiaMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
                     const ultimoDiaStr = ultimoDiaMes.toISOString().split('T')[0];
 
-                    const { data: transacoes, error: errTrans } = await supabaseClient
+                    // Todas as transações do mês
+                    const { data: todasContas, error: errTodasContas } = await supabaseClient
                         .from('financial_transactions')
-                        .select('amount, type')
+                        .select('id, description, amount, date, due_date, type, status, payment_method, payment_date, category_id, notes, chart_of_accounts(name, type)')
                         .gte('date', primeiroDiaStr)
-                        .lte('date', ultimoDiaStr);
+                        .lte('date', ultimoDiaStr)
+                        .order('date', { ascending: false })
+                        .limit(100);
 
+                    if (errTodasContas) console.error('  ❌ Erro todas contas:', errTodasContas);
+                    else console.log(`  ✅ ${todasContas?.length || 0} transações no mês`);
+
+                    // Contas vencidas (pendentes com due_date < hoje)
+                    const { data: contasVencidasData, error: errCV } = await supabaseClient
+                        .from('financial_transactions')
+                        .select('id, description, amount, due_date, type, status, payment_method, chart_of_accounts(name)')
+                        .eq('status', 'pendente')
+                        .lt('due_date', hoje)
+                        .order('due_date', { ascending: true });
+
+                    if (errCV) console.error('  ❌ Erro contas vencidas:', errCV);
+                    else console.log(`  ✅ ${contasVencidasData?.length || 0} contas vencidas`);
+
+                    // Contas pagas no mês
+                    const { data: contasPagasData, error: errCP } = await supabaseClient
+                        .from('financial_transactions')
+                        .select('id, description, amount, due_date, type, status, payment_date, chart_of_accounts(name)')
+                        .eq('status', 'pago')
+                        .gte('payment_date', primeiroDiaStr)
+                        .lte('payment_date', ultimoDiaStr)
+                        .order('payment_date', { ascending: false });
+
+                    if (errCP) console.error('  ❌ Erro contas pagas:', errCP);
+                    else console.log(`  ✅ ${contasPagasData?.length || 0} contas pagas no mês`);
+
+                    // Contas a vencer (próximos 7 dias)
+                    const { data: contasProximasData, error: errProx } = await supabaseClient
+                        .from('financial_transactions')
+                        .select('id, description, amount, due_date, type, status, chart_of_accounts(name)')
+                        .eq('status', 'pendente')
+                        .gte('due_date', hoje)
+                        .lte('due_date', dataFim7Str)
+                        .order('due_date', { ascending: true });
+
+                    if (errProx) console.error('  ❌ Erro contas próximas:', errProx);
+                    else console.log(`  ✅ ${contasProximasData?.length || 0} contas próximas`);
+
+                    // Contas a vencer (15 dias)
+                    const { data: contas15DiasData, error: err15 } = await supabaseClient
+                        .from('financial_transactions')
+                        .select('id, description, amount, due_date, type, status, chart_of_accounts(name)')
+                        .eq('status', 'pendente')
+                        .gte('due_date', hoje)
+                        .lte('due_date', dataFim15Str)
+                        .order('due_date', { ascending: true });
+
+                    // Calcular receitas e despesas do mês
                     let receitas = 0,
                         despesas = 0;
-                    if (transacoes) {
-                        transacoes.forEach(t => {
+                    if (todasContas) {
+                        todasContas.forEach(t => {
                             const v = parseFloat(t.amount);
                             if (v > 0) receitas += v;
                             else despesas += Math.abs(v);
                         });
                     }
 
-                    // ===== 8. Contas vencidas =====
-                    const { count: contasVencidas, error: errCV } = await supabaseClient
-                        .from('financial_transactions')
-                        .select('id', { count: 'exact' })
-                        .eq('status', 'pendente')
-                        .lt('due_date', hoje);
-
-                    if (errCV) console.error('  ❌ Erro contas vencidas:', errCV);
-
-                    // ===== 9. Contas próximas =====
-                    const { data: contasProximas, error: errCP } = await supabaseClient
-                        .from('financial_transactions')
-                        .select('id, description, amount, due_date, type, status, chart_of_accounts(name)')
-                        .eq('status', 'pendente')
-                        .gte('due_date', hoje)
-                        .lte('due_date', dataFim7Str)
-                        .order('due_date', { ascending: true })
-                        .limit(20);
-
-                    if (errCP) console.error('  ❌ Erro contas próximas:', errCP);
-
-                    // ===== 10. Funcionários ativos (count) =====
+                    // ===== 8. Funcionários ativos (count) =====
                     const { count: qtdFuncionarios, error: errFunc } = await supabaseClient
                         .from('employees')
                         .select('id', { count: 'exact' })
@@ -1289,7 +1378,7 @@
 
                     if (errFunc) console.error('  ❌ Erro funcionários:', errFunc);
 
-                    // ===== 11. Férias =====
+                    // ===== 9. Férias =====
                     const { data: ferias, error: errFer } = await supabaseClient
                         .from('employee_vacations')
                         .select('id, employee_id, start_date, end_date, status, notes, employees(full_name)')
@@ -1306,7 +1395,7 @@
                         return f.status === 'agendada' && inicio <= hojeDate && fim >= hojeDate;
                     }) : [];
 
-                    // ===== 12. Parcelas de dívidas =====
+                    // ===== 10. Parcelas de dívidas =====
                     const { data: parcelasDividas, error: errDiv } = await supabaseClient
                         .from('debt_installments')
                         .select('id, amount, due_date, installment_number, debts(id, creditor, type)')
@@ -1329,14 +1418,19 @@
                         pecasHoje: pecasHoje || 0,
                         receitas: receitas || 0,
                         despesas: despesas || 0,
-                        contasVencidas: contasVencidas || 0,
-                        contasProximas: contasProximas || [],
+                        contasVencidas: contasVencidasData?.length || 0,
+                        contasVencidasData: contasVencidasData || [],
+                        contasProximas: contasProximasData || [],
+                        contasPagas: contasPagasData || [],
+                        contas15Dias: contas15DiasData || [],
+                        todasContas: todasContas || [],
                         qtdFuncionarios: qtdFuncionarios || 0,
                         ferias: ferias || [],
                         feriasEmAndamento: feriasEmAndamento || [],
                         parcelasDividas: parcelasDividas || [],
                         todasOS: todasOS || [],
-                        funcionarios: funcionarios || []
+                        funcionarios: funcionarios || [],
+                        saldoAtual: receitas - despesas
                     };
 
                     // ============================================================
@@ -1422,7 +1516,7 @@
                         html = renderizarProducao(filtrarOS(dadosCache.osAtivas));
                         break;
                     case 'financeiro':
-                        html = renderizarFinanceiro(filtrarContas(dadosCache.contasProximas));
+                        html = renderizarFinanceiroCompleto();
                         break;
                     case 'rh':
                         html = renderizarRH(filtrarFerias(dadosCache.ferias), filtrarFuncionarios(dadosCache.funcionarios));
@@ -1593,70 +1687,181 @@
             }
 
             // ============================================================
-            // RENDERIZAÇÃO: FINANCEIRO
+            // RENDERIZAÇÃO: FINANCEIRO COMPLETO
             // ============================================================
-            function renderizarFinanceiro(contasLista) {
+            function renderizarFinanceiroCompleto() {
                 const d = dadosCache;
+                const saldo = d.receitas - d.despesas;
 
-                let html = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                        <span style="font-size:12px;color:var(--gray);">${contasLista.length} contas nos próximos 7 dias</span>
-                        <span style="font-size:11px;color:var(--gray-dark);">${d.contasVencidas} vencidas</span>
+                // Se não houver dados, mostra mensagem
+                if (d.todasContas.length === 0 && d.contasVencidas === 0 && d.contasProximas.length === 0) {
+                    return `
+                        <div class="empty-state">
+                            <i class="ph ph-currency-circle-dollar"></i>
+                            <p>Nenhuma transação financeira encontrada neste mês.</p>
+                        </div>
+                    `;
+                }
+
+                let html = '';
+
+                // ===== RESUMO FINANCEIRO =====
+                html += `
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(76,175,80,0.15);">
+                            <div style="font-size:8px;color:var(--gray);text-transform:uppercase;">Receitas</div>
+                            <div style="font-size:16px;font-weight:700;color:var(--success);">${formatCurrency(d.receitas)}</div>
+                            <div style="font-size:8px;color:var(--gray-dark);">${d.todasContas.filter(c => parseFloat(c.amount) > 0).length} lançamentos</div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,82,82,0.15);">
+                            <div style="font-size:8px;color:var(--gray);text-transform:uppercase;">Despesas</div>
+                            <div style="font-size:16px;font-weight:700;color:var(--error);">${formatCurrency(d.despesas)}</div>
+                            <div style="font-size:8px;color:var(--gray-dark);">${d.todasContas.filter(c => parseFloat(c.amount) < 0).length} lançamentos</div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;border:1px solid ${saldo >= 0 ? 'rgba(76,175,80,0.2)' : 'rgba(255,82,82,0.2)'};">
+                            <div style="font-size:8px;color:var(--gray);text-transform:uppercase;">Saldo</div>
+                            <div style="font-size:16px;font-weight:700;color:${saldo >= 0 ? 'var(--success)' : 'var(--error)'};">${formatCurrency(saldo)}</div>
+                            <div style="font-size:8px;color:var(--gray-dark);">${saldo >= 0 ? '📈 Lucro' : '📉 Prejuízo'}</div>
+                        </div>
                     </div>
-                    <div class="list-wrapper">
                 `;
 
-                if (contasLista.length === 0) {
+                // ===== FILTROS RÁPIDOS =====
+                html += `
+                    <div class="filter-tabs" id="filtrosFinanceiro">
+                        <button class="filter-tab ${filtroFinanceiro === 'todas' ? 'active' : ''}" data-filtro="todas" onclick="window.setFiltroFinanceiro('todas')">Todas</button>
+                        <button class="filter-tab ${filtroFinanceiro === 'vencidas' ? 'active' : ''}" data-filtro="vencidas" onclick="window.setFiltroFinanceiro('vencidas')">Vencidas</button>
+                        <button class="filter-tab ${filtroFinanceiro === 'proximas' ? 'active' : ''}" data-filtro="proximas" onclick="window.setFiltroFinanceiro('proximas')">Próximas</button>
+                        <button class="filter-tab ${filtroFinanceiro === 'pagas' ? 'active' : ''}" data-filtro="pagas" onclick="window.setFiltroFinanceiro('pagas')">Pagas</button>
+                        <button class="filter-tab ${filtroFinanceiro === 'receber' ? 'active' : ''}" data-filtro="receber" onclick="window.setFiltroFinanceiro('receber')">A Receber</button>
+                        <button class="filter-tab ${filtroFinanceiro === 'pagar' ? 'active' : ''}" data-filtro="pagar" onclick="window.setFiltroFinanceiro('pagar')">A Pagar</button>
+                    </div>
+                `;
+
+                // ===== DADOS FILTRADOS =====
+                let contasParaExibir = [];
+                let tituloSecao = 'Todas as Transações';
+
+                switch (filtroFinanceiro) {
+                    case 'vencidas':
+                        contasParaExibir = d.contasVencidasData || [];
+                        tituloSecao = '🔴 Contas Vencidas';
+                        break;
+                    case 'proximas':
+                        contasParaExibir = d.contasProximas || [];
+                        tituloSecao = '⏳ Contas a Vencer (7 dias)';
+                        break;
+                    case 'pagas':
+                        contasParaExibir = d.contasPagas || [];
+                        tituloSecao = '✅ Contas Pagas no Mês';
+                        break;
+                    case 'receber':
+                        contasParaExibir = d.todasContas.filter(c => c.type === 'receber' && c.status !== 'pago');
+                        tituloSecao = '📈 A Receber';
+                        break;
+                    case 'pagar':
+                        contasParaExibir = d.todasContas.filter(c => c.type === 'pagar' && c.status !== 'pago');
+                        tituloSecao = '📉 A Pagar';
+                        break;
+                    default:
+                        contasParaExibir = d.todasContas.slice(0, 30);
+                        tituloSecao = '📋 Todas as Transações do Mês';
+                        break;
+                }
+
+                // Aplica busca se houver
+                if (termoBusca) {
+                    contasParaExibir = contasParaExibir.filter(c => {
+                        const desc = (c.description || '').toLowerCase();
+                        const cat = (c.chart_of_accounts?.name || '').toLowerCase();
+                        return desc.includes(termoBusca) || cat.includes(termoBusca);
+                    });
+                }
+
+                // ===== TÍTULO DA SEÇÃO =====
+                html += `
+                    <div class="section-header">
+                        <div class="section-title"><i class="ph ph-list"></i> ${tituloSecao}</div>
+                        <span class="section-badge">${contasParaExibir.length}</span>
+                    </div>
+                `;
+
+                // ===== LISTA DE CONTAS =====
+                if (contasParaExibir.length === 0) {
                     html += `
                         <div class="empty-state">
                             <i class="ph ph-currency-circle-dollar"></i>
-                            <p>${termoBusca ? 'Nenhuma conta encontrada para "' + termoBusca + '"' : 'Nenhuma conta a vencer nos próximos 7 dias'}</p>
+                            <p>${termoBusca ? 'Nenhuma conta encontrada para "' + termoBusca + '"' : 'Nenhuma conta nesta categoria'}</p>
                         </div>
                     `;
                 } else {
-                    contasLista.forEach(c => {
+                    html += `<div class="list-wrapper">`;
+                    contasParaExibir.forEach(c => {
                         const isReceber = c.type === 'receber';
-                        const diasFalta = Math.ceil((new Date(c.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+                        const valor = parseFloat(c.amount);
+                        const isPago = c.status === 'pago';
+                        const isVencida = c.status === 'pendente' && new Date(c.due_date) < new Date();
+                        const isProxima = c.status === 'pendente' && new Date(c.due_date) >= new Date() && new Date(c.due_date) <= new Date(Date.now() + 7 * 86400000);
+                        
+                        let classeStatus = '';
+                        let badgeStatus = '';
+                        if (isPago) {
+                            classeStatus = 'item-success';
+                            badgeStatus = '<span class="item-badge badge-pago">✅ Pago</span>';
+                        } else if (isVencida) {
+                            classeStatus = 'item-danger';
+                            badgeStatus = '<span class="item-badge badge-vencido">🔴 Vencida</span>';
+                        } else if (isProxima) {
+                            classeStatus = 'item-warning';
+                            badgeStatus = '<span class="item-badge badge-pendente">⏳ Pendente</span>';
+                        } else {
+                            badgeStatus = '<span class="item-badge badge-pendente">⏳ Pendente</span>';
+                        }
+
+                        const dataExibicao = isPago ? c.payment_date : c.due_date;
+                        const labelData = isPago ? 'Pago em' : 'Vence em';
 
                         html += `
-                            <div class="list-item ${diasFalta <= 2 ? 'item-danger' : ''}" onclick="window.verDetalhesConta('${c.id}')">
+                            <div class="list-item ${classeStatus}" onclick="window.verDetalhesConta('${c.id}')">
                                 <div class="item-main">
                                     <div class="item-title">${c.description || 'Sem descrição'}</div>
-                                    <div class="item-sub">${c.chart_of_accounts?.name || 'Sem categoria'} · ${formatDate(c.due_date)}</div>
+                                    <div class="item-sub">${c.chart_of_accounts?.name || 'Sem categoria'} · ${labelData} ${formatDate(dataExibicao)}</div>
                                 </div>
                                 <div class="item-right">
                                     <div class="item-value ${isReceber ? 'item-success' : 'item-error'}">
-                                        ${isReceber ? '+' : '-'}${formatCurrency(Math.abs(c.amount))}
+                                        ${isReceber ? '+' : '-'}${formatCurrency(Math.abs(valor))}
                                     </div>
-                                    <div style="font-size:9px;color:${diasFalta <= 2 ? 'var(--error)' : 'var(--gray-dark)'};">
-                                        ${isReceber ? 'A Receber' : 'A Pagar'} · ${diasFalta} dias
-                                    </div>
+                                    <div style="margin-top:2px;">${badgeStatus}</div>
                                 </div>
                             </div>
                         `;
                     });
+                    html += `</div>`;
                 }
 
-                html += `</div>`;
+                // ===== RESUMO DO FILTRO ATUAL =====
+                if (contasParaExibir.length > 0) {
+                    const totalValor = contasParaExibir.reduce((s, c) => s + parseFloat(c.amount), 0);
+                    const totalPositivo = contasParaExibir.filter(c => parseFloat(c.amount) > 0).reduce((s, c) => s + parseFloat(c.amount), 0);
+                    const totalNegativo = contasParaExibir.filter(c => parseFloat(c.amount) < 0).reduce((s, c) => s + parseFloat(c.amount), 0);
 
-                // Resumo financeiro
-                const saldo = d.receitas - d.despesas;
-                html += `
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;">
-                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;">
-                            <div style="font-size:9px;color:var(--gray);">Receitas</div>
-                            <div style="font-size:16px;font-weight:700;color:var(--success);">${formatCurrency(d.receitas)}</div>
+                    html += `
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;">
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;text-align:center;">
+                                <div style="font-size:8px;color:var(--gray);">Total</div>
+                                <div style="font-size:14px;font-weight:700;color:${totalValor >= 0 ? 'var(--success)' : 'var(--error)'};">${formatCurrency(totalValor)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(76,175,80,0.1);">
+                                <div style="font-size:8px;color:var(--gray);">Entradas</div>
+                                <div style="font-size:14px;font-weight:700;color:var(--success);">${formatCurrency(totalPositivo)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(255,82,82,0.1);">
+                                <div style="font-size:8px;color:var(--gray);">Saídas</div>
+                                <div style="font-size:14px;font-weight:700;color:var(--error);">${formatCurrency(Math.abs(totalNegativo))}</div>
+                            </div>
                         </div>
-                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;">
-                            <div style="font-size:9px;color:var(--gray);">Despesas</div>
-                            <div style="font-size:16px;font-weight:700;color:var(--error);">${formatCurrency(d.despesas)}</div>
-                        </div>
-                        <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center;border:1px solid ${saldo >= 0 ? 'rgba(76,175,80,0.2)' : 'rgba(255,82,82,0.2)'};">
-                            <div style="font-size:9px;color:var(--gray);">Saldo</div>
-                            <div style="font-size:16px;font-weight:700;color:${saldo >= 0 ? 'var(--success)' : 'var(--error)'};">${formatCurrency(saldo)}</div>
-                        </div>
-                    </div>
-                `;
+                    `;
+                }
 
                 return html;
             }
@@ -1862,11 +2067,21 @@
             }
 
             // ============================================================
+            // FILTRO FINANCEIRO
+            // ============================================================
+            function setFiltroFinanceiro(filtro) {
+                filtroFinanceiro = filtro;
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.filtro === filtro);
+                });
+                renderizarConteudo();
+            }
+
+            // ============================================================
             // NAVEGAÇÃO ENTRE ABAS
             // ============================================================
             function irAba(aba) {
                 if (aba === abaAtual) {
-                    // Se já está na aba, recarrega os dados
                     carregarDados();
                     return;
                 }
@@ -1880,6 +2095,11 @@
                 termoBusca = '';
                 searchInput.value = '';
                 clearSearch.classList.remove('visible');
+
+                // Reseta filtro do financeiro ao entrar na aba
+                if (aba === 'financeiro') {
+                    filtroFinanceiro = 'todas';
+                }
 
                 renderizarConteudo();
                 appContent.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1975,13 +2195,21 @@
                     if (error) throw error;
 
                     const isReceber = conta.type === 'receber';
-                    const diasFalta = Math.ceil((new Date(conta.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+                    const isPago = conta.status === 'pago';
+                    const isVencida = conta.status === 'pendente' && new Date(conta.due_date) < new Date();
+                    const diasFalta = isPago ? 0 : Math.ceil((new Date(conta.due_date) - new Date()) / (1000 * 60 * 60 * 24));
+
+                    let statusBadge = '';
+                    if (isPago) statusBadge = '<span class="item-badge badge-pago">✅ Pago</span>';
+                    else if (isVencida) statusBadge = '<span class="item-badge badge-vencido">🔴 Vencida</span>';
+                    else if (diasFalta <= 2) statusBadge = '<span class="item-badge badge-pendente">⏳ Urgente</span>';
+                    else statusBadge = '<span class="item-badge badge-pendente">⏳ Pendente</span>';
 
                     let html = `
                         <div style="margin-bottom:16px;">
                             <div style="display:flex;justify-content:space-between;align-items:center;">
-                                <h4 style="color:${isReceber ? 'var(--success)' : 'var(--error)'};">${isReceber ? 'A Receber' : 'A Pagar'}</h4>
-                                <span style="font-size:12px;color:var(--gray);">${conta.status === 'pago' ? '✅ Pago' : '⏳ Pendente'}</span>
+                                <h4 style="color:${isReceber ? 'var(--success)' : 'var(--error)'};">${isReceber ? '📈 A Receber' : '📉 A Pagar'}</h4>
+                                ${statusBadge}
                             </div>
                             <p style="color:var(--white);font-size:14px;font-weight:600;margin-top:4px;">${conta.description || 'Sem descrição'}</p>
                         </div>
@@ -1991,8 +2219,16 @@
                                 <div style="font-weight:600;">${conta.chart_of_accounts?.name || '-'}</div>
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
-                                <div style="font-size:9px;color:var(--gray);">Vencimento</div>
-                                <div style="font-weight:600;${diasFalta <= 2 ? 'color:var(--error);' : ''}">${formatDate(conta.due_date)}</div>
+                                <div style="font-size:9px;color:var(--gray);">Data</div>
+                                <div style="font-weight:600;">${formatDate(conta.date)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;${isVencida ? 'border:1px solid var(--error);' : ''}">
+                                <div style="font-size:9px;color:var(--gray);">${isPago ? 'Pago em' : 'Vencimento'}</div>
+                                <div style="font-weight:600;${isVencida ? 'color:var(--error);' : ''}">${formatDate(isPago ? conta.payment_date : conta.due_date)}</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;">
+                                <div style="font-size:9px;color:var(--gray);">Forma</div>
+                                <div style="font-weight:600;">${conta.payment_method || '-'}</div>
                             </div>
                             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;grid-column:span 2;">
                                 <div style="font-size:9px;color:var(--gray);">Valor</div>
@@ -2166,7 +2402,7 @@
             // ============================================================
             // NAVEGAÇÃO E INTERAÇÃO
             // ============================================================
-            // Expor funções globalmente para onclick
+            window.setFiltroFinanceiro = setFiltroFinanceiro;
             window.irAba = irAba;
             window.fecharModal = fecharModal;
             window.verDetalhesOS = verDetalhesOS;
@@ -2179,7 +2415,6 @@
             // ============================================================
             // EVENTOS
             // ============================================================
-            // Scroll to top
             appContent.addEventListener('scroll', function() {
                 scrollTopBtn.classList.toggle('visible', this.scrollTop > 200);
             });
@@ -2188,16 +2423,13 @@
                 appContent.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            // Refresh
             $('btnRefresh').addEventListener('click', carregarDados);
 
-            // Modal close
             modalClose.addEventListener('click', fecharModal);
             modalOverlay.addEventListener('click', function(e) {
                 if (e.target === this) fecharModal();
             });
 
-            // Search
             searchInput.addEventListener('input', function() {
                 termoBusca = this.value.trim();
                 clearSearch.classList.toggle('visible', termoBusca.length > 0);
@@ -2211,7 +2443,6 @@
                 renderizarConteudo();
             });
 
-            // Tab bar
             document.querySelectorAll('.tab-item').forEach(tab => {
                 tab.addEventListener('click', function() {
                     irAba(this.dataset.tab);
@@ -2265,7 +2496,6 @@
                 conectado = await testarConexao();
                 await carregarDados();
 
-                // Atualização automática a cada 60 segundos
                 setInterval(async () => {
                     if (navigator.onLine) {
                         await carregarDados();
@@ -2275,7 +2505,6 @@
                     }
                 }, 60000);
 
-                // Monitora conectividade
                 window.addEventListener('online', async function() {
                     statusDot.className = 'dot online';
                     statusText.textContent = 'Online';
@@ -2294,6 +2523,7 @@
             console.log('  • Use a busca para filtrar dados');
             console.log('  • Puxe para baixo para atualizar');
             console.log('  • Navegue pelas abas inferiores');
+            console.log('  • Módulo Financeiro completo com filtros');
 
         })();
     </script>
